@@ -1,0 +1,8 @@
+{
+  "name": "js_solar_assistant",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
