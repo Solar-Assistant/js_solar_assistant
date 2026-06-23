@@ -4,6 +4,7 @@ import { cardStyles } from './styles.js'
 const template = `
   <style>
     :host { display: block; font-family: inherit; }
+    :host(.embedded) .hide-android { display: none; }
     ${cardStyles}
 
     /* List */
@@ -146,7 +147,7 @@ function formatDate(iso) {
 
 class SaSites extends HTMLElement {
   connectedCallback() {
-    const token = sessionStorage.getItem('sa_token')
+    const token = localStorage.getItem('sa_token')
     if (!token) {
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
@@ -191,7 +192,7 @@ class SaSites extends HTMLElement {
   async _fetchSites() {
     const res = await this._api.get('/sites')
     if (res.status === 401) {
-      sessionStorage.removeItem('sa_token')
+      localStorage.removeItem('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
       return
@@ -250,7 +251,7 @@ class SaSites extends HTMLElement {
     try {
       const siteRes = await this._api.get(`/sites/${id}`)
       if (siteRes.status === 401) {
-        sessionStorage.removeItem('sa_token')
+        localStorage.removeItem('sa_token')
         window.location.href = this.getAttribute('sign-in') || '/sign_in'
         return
       }
@@ -276,9 +277,9 @@ class SaSites extends HTMLElement {
       list.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 16px">
           <h1 style="margin:0;font-size:24px;font-weight:700">
-            <span class="breadcrumb"><a class="back">Sites</a> › </span>${name}
+            <span class="breadcrumb hide-android"><a class="back">Sites</a> › </span>${name}
           </h1>
-          ${siteUrl(site) ? `<a class="connect" href="${siteUrl(site)}" target="_blank">Connect →</a>` : ''}
+          ${siteUrl(site) ? `<a class="connect hide-android" href="${siteUrl(site)}" target="_blank">Connect →</a>` : ''}
         </div>
 
         <div class="card">
@@ -366,7 +367,7 @@ class SaSites extends HTMLElement {
     list.innerHTML = `
       <h1 style="margin:0 0 16px;font-size:24px;font-weight:700">
         <span class="breadcrumb">
-          <a class="back-list">Sites</a> ›
+          <span class="hide-android"><a class="back-list">Sites</a> › </span>
           <a class="back-site">${name}</a> ›
           Invite user
         </span>

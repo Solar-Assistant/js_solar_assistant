@@ -3,9 +3,9 @@ export const BASE = import.meta.env.DEV
   : 'https://solar-assistant.io/api/v1'
 
 // Returns an API client bound to a bearer token.
-// Token is stored in sessionStorage under 'sa_token' after sign-in.
+// Token is stored in localStorage under 'sa_token' after sign-in.
 //
-//   const api = apiClient(sessionStorage.getItem('sa_token'))
+//   const api = apiClient(localStorage.getItem('sa_token'))
 //   const sites = await api.get('/sites')
 //
 // All methods return a Response (call .json() to parse). A 401 means the token

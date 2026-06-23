@@ -45,7 +45,7 @@ const template = `
 
 class SaUser extends HTMLElement {
   connectedCallback() {
-    const token = sessionStorage.getItem('sa_token')
+    const token = localStorage.getItem('sa_token')
     if (!token) {
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
@@ -59,7 +59,7 @@ class SaUser extends HTMLElement {
     this._load()
 
     this.shadowRoot.getElementById('sign-out').addEventListener('click', () => {
-      sessionStorage.removeItem('sa_token')
+      localStorage.removeItem('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = signIn
     })
@@ -68,7 +68,7 @@ class SaUser extends HTMLElement {
   async _load() {
     const res = await this._api.get('/user')
     if (res.status === 401) {
-      sessionStorage.removeItem('sa_token')
+      localStorage.removeItem('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
       return

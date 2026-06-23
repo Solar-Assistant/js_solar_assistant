@@ -7,7 +7,7 @@ REST API. Use it to build your own UI instead of (or alongside) the
 ```js
 import { apiClient, siteUrl, inviteRoles } from '@solar-assistant/api'
 
-const api = apiClient(sessionStorage.getItem('sa_token'))
+const api = apiClient(localStorage.getItem('sa_token'))
 const sites = await (await api.get('/sites')).json()
 ```
 
@@ -15,7 +15,7 @@ const sites = await (await api.get('/sites')).json()
 
 ### `apiClient(token)`
 
-Returns a client bound to a bearer token (stored in `sessionStorage` as
+Returns a client bound to a bearer token (stored in `localStorage` as
 `sa_token` after sign-in). Every method returns a `fetch` `Response` — call
 `.json()` to parse the body. A `401` means the token is expired; redirect to
 sign-in.
@@ -97,8 +97,8 @@ Response: `{ host, site_id, site_name, site_key, token, local_ip }`.
 
 ### `POST /session` and `POST /sign_in`
 
-Used for the token hand-off flow — see
-[Authentication & token hand-off](authentication.md).
+Used for the auth transfer flow — see
+[Authentication & auth transfer](authentication.md).
 
 ## Helpers
 

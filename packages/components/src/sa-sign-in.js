@@ -38,10 +38,10 @@ const template = `
 
 class SaSignIn extends HTMLElement {
   connectedCallback() {
-    // Token handed off from the mobile app — via the URL hash (preferred, so it
+    // Token transferred from the mobile app — via the URL hash (preferred, so it
     // isn't sent to the server) or the query string as a fallback. This is a
     // short-lived *session_token*, not a bearer token: it must be exchanged at
-    // POST /sign_in for the real API token. A handoff token always takes
+    // POST /sign_in for the real API token. An auth-transfer token always takes
     // precedence over an existing session, so opening this with a fresh token
     // re-signs the user in rather than passing them through.
     const hash = new URLSearchParams(window.location.hash.slice(1))
@@ -55,7 +55,7 @@ class SaSignIn extends HTMLElement {
     }
 
     // Already signed in — redirect to return-to or default
-    if (sessionStorage.getItem('sa_token')) {
+    if (localStorage.getItem('sa_token')) {
       window.location.replace(returnTo)
       return
     }
@@ -64,6 +64,9 @@ class SaSignIn extends HTMLElement {
   }
 
   _renderForm() {
+    // Reveal the page if an auth transfer was in progress but didn't redirect
+    // (e.g. an expired/invalid token) — see the `auth-transfer` spinner in the host page.
+    document.documentElement.classList.remove('auth-transfer')
     this.attachShadow({ mode: 'open' })
     this.shadowRoot.innerHTML = template
     this.shadowRoot.querySelector('form').addEventListener('submit', e => this._submit(e))
@@ -78,14 +81,14 @@ class SaSignIn extends HTMLElement {
       })
       if (res.ok) {
         const { token } = await res.json()
-        sessionStorage.setItem('sa_token', token)
+        localStorage.setItem('sa_token', token)
         window.location.replace(returnTo)
         return
       }
     } catch {
       // fall through to the sign-in form
     }
-    // Invalid or expired handoff token — show the normal sign-in form.
+    // Invalid or expired auth-transfer token — show the normal sign-in form.
     this._renderForm()
   }
 
@@ -109,7 +112,7 @@ class SaSignIn extends HTMLElement {
 
       if (res.ok) {
         const { token } = await res.json()
-        sessionStorage.setItem('sa_token', token)
+        localStorage.setItem('sa_token', token)
         const params = new URLSearchParams(window.location.search)
         const returnTo = params.get('return_to') || this.getAttribute('return-to') || '/sites'
         window.location.href = returnTo

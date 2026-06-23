@@ -66,7 +66,7 @@ isn't signed in yet.
 ## Components
 
 All three are self-contained custom elements. They keep the signed-in API token
-in `sessionStorage` under `sa_token`.
+in `localStorage` under `sa_token` (shared across tabs, persists until sign-out).
 
 ### `<sa-sign-in>`
 
@@ -76,8 +76,8 @@ Renders the email/password sign-in form and handles the response.
 |---|---|---|
 | `return-to` | `/sites` | Where to send the user after a successful sign-in. A `?return_to=` query param on the page URL overrides it. |
 
-It also accepts a **token hand-off** from a mobile app / external flow — see
-[Authentication](#authentication-and-token-hand-off).
+It also accepts an **auth transfer** from a mobile app / external flow — see
+[Authentication](#authentication).
 
 ### `<sa-sites>`
 
@@ -131,12 +131,12 @@ defaults.
 ## Authentication
 
 `<sa-sign-in>` signs the user in with email/password and stores the API token in
-`sessionStorage`; the other components read it and redirect to the sign-in page
-on a `401`. You can also hand off an existing session from a native app or SSO
+`localStorage`; the other components read it and redirect to the sign-in page
+on a `401`. You can also transfer an existing session from a native app or SSO
 flow by opening the sign-in page with a short-lived token.
 
-See **[Authentication & token hand-off](docs/authentication.md)** for the full
-flow, the mobile/WebView hand-off, and token details.
+See **[Authentication & auth transfer](docs/authentication.md)** for the full
+flow, the mobile/WebView transfer, and token details.
 
 ## Using the API client directly
 
@@ -145,7 +145,7 @@ For custom UIs, talk to the API without the components:
 ```js
 import { apiClient, siteUrl } from '@solar-assistant/api'
 
-const api = apiClient(sessionStorage.getItem('sa_token'))
+const api = apiClient(localStorage.getItem('sa_token'))
 
 const sites = await (await api.get('/sites')).json()
 const filtered = await (await api.get('/sites', { inverter: 'srne', limit: 50 })).json()
