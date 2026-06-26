@@ -1,4 +1,4 @@
-import { BASE } from '@solar-assistant/api'
+import { BASE, persistSession, readToken } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
 
 const template = `
@@ -25,19 +25,53 @@ const template = `
     }
     button:disabled { opacity: 0.6; cursor: default; }
     .error { color: #ef4444; font-size: 13px; }
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #374151;
+      cursor: pointer;
+    }
+    .remember input { width: auto; margin: 0; accent-color: var(--sa-primary, #f97316); }
   </style>
   <div class="card"><div class="card-section">
     <form>
       <input type="email" name="email" placeholder="Email" required />
       <input type="password" name="password" placeholder="Password" required />
+      <label class="remember">
+        <input type="checkbox" name="remember" checked />
+        Keep me signed in
+      </label>
       <button type="submit">Sign in</button>
       <span class="error"></span>
     </form>
   </div></div>
 `
 
+const spinnerTemplate = `
+  <style>
+    :host { display: flex; justify-content: center; padding: 48px 0; }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--sa-border, #e3e5e6);
+      border-top-color: var(--sa-primary, #f97316);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+  <div class="spinner"></div>
+`
+
 class SaSignIn extends HTMLElement {
   connectedCallback() {
+    if (!this.getAttribute('organization-id')) {
+      this.textContent = 'Error: organization-id attribute is required on <sa-sign-in>.'
+      return
+    }
+
     // Token transferred from the mobile app — via the URL hash (preferred, so it
     // isn't sent to the server) or the query string as a fallback. This is a
     // short-lived *session_token*, not a bearer token: it must be exchanged at
@@ -49,14 +83,16 @@ class SaSignIn extends HTMLElement {
     const sessionToken = hash.get('token') || query.get('token')
     const returnTo = hash.get('return_to') || query.get('return_to') || this.getAttribute('return-to') || '/sites'
 
-    if (sessionToken) {
-      this._exchange(sessionToken, returnTo)
+    if (readToken('sa_token')) {
+      window.location.replace(returnTo)
       return
     }
 
-    // Already signed in — redirect to return-to or default
-    if (localStorage.getItem('sa_token')) {
-      window.location.replace(returnTo)
+    this.attachShadow({ mode: 'open' })
+
+    if (sessionToken) {
+      this.shadowRoot.innerHTML = spinnerTemplate
+      this._exchange(sessionToken, returnTo)
       return
     }
 
@@ -64,10 +100,7 @@ class SaSignIn extends HTMLElement {
   }
 
   _renderForm() {
-    // Reveal the page if an auth transfer was in progress but didn't redirect
-    // (e.g. an expired/invalid token) — see the `auth-transfer` spinner in the host page.
     document.documentElement.classList.remove('auth-transfer')
-    this.attachShadow({ mode: 'open' })
     this.shadowRoot.innerHTML = template
     this.shadowRoot.querySelector('form').addEventListener('submit', e => this._submit(e))
   }
@@ -80,15 +113,14 @@ class SaSignIn extends HTMLElement {
         body: JSON.stringify({ session_token: sessionToken }),
       })
       if (res.ok) {
-        const { token } = await res.json()
-        localStorage.setItem('sa_token', token)
+        const { token, expires_at } = await res.json()
+        persistSession(localStorage, 'sa_token', token, expires_at)
         window.location.replace(returnTo)
         return
       }
     } catch {
       // fall through to the sign-in form
     }
-    // Invalid or expired auth-transfer token — show the normal sign-in form.
     this._renderForm()
   }
 
@@ -107,12 +139,13 @@ class SaSignIn extends HTMLElement {
       const res = await fetch(`${BASE}/sign_in`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, organization_id: Number(this.getAttribute('organization-id')) }),
       })
 
       if (res.ok) {
-        const { token } = await res.json()
-        localStorage.setItem('sa_token', token)
+        const { token, expires_at } = await res.json()
+        const storage = form.remember.checked ? localStorage : sessionStorage
+        persistSession(storage, 'sa_token', token, expires_at)
         const params = new URLSearchParams(window.location.search)
         const returnTo = params.get('return_to') || this.getAttribute('return-to') || '/sites'
         window.location.href = returnTo

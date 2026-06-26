@@ -56,6 +56,39 @@ export function inviteRoles(site, currentUser) {
   return base
 }
 
+export function persistSession(storage, key, token, expiresAt) {
+  storage.setItem(key, token)
+  storage.setItem(`${key}_expires_at`, expiresAt)
+}
+
+export function sessionValid(storage, key) {
+  const token = storage.getItem(key)
+  if (!token) return false
+  // Enforce expiry when the API gave us one we can parse; otherwise fall back to
+  // token presence (older API builds don't return expires_at).
+  const expiresAt = storage.getItem(`${key}_expires_at`)
+  const expiry = expiresAt ? new Date(expiresAt).getTime() : NaN
+  if (Number.isNaN(expiry)) return true
+  return Date.now() < expiry
+}
+
+// Returns a valid token from sessionStorage or localStorage, or null if neither
+// holds a live session. sessionStorage is checked first so a per-session sign-in
+// ("keep me signed in" unchecked) takes precedence over a stale persisted one.
+export function readToken(key) {
+  if (sessionValid(sessionStorage, key)) return sessionStorage.getItem(key)
+  if (sessionValid(localStorage, key)) return localStorage.getItem(key)
+  return null
+}
+
+// Removes the token and its expiry from both storages.
+export function clearSession(key) {
+  for (const storage of [localStorage, sessionStorage]) {
+    storage.removeItem(key)
+    storage.removeItem(`${key}_expires_at`)
+  }
+}
+
 export function siteUrl(site) {
   if (!site.name || !site.proxy) return null
   const region = site.proxy.split('-')[0]

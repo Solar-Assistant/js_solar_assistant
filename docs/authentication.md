@@ -1,36 +1,35 @@
-# Authentication & auth transfer
+# Authentication
 
-How `<sa-sign-in>` establishes a session, and how to sign a user in from an
-external context (a native mobile app, or a single-sign-on transfer) without
-asking for a password again.
-
-## Normal sign-in
-
-`<sa-sign-in>` POSTs the email/password to the Solar Assistant API, receives a
-bearer token, and stores it in `localStorage` under `sa_token`:
+The SolarAssistant API uses bearer tokens. A user signs in with email and password,
+receives a token, and that token is included in every subsequent API request. The
+token is stored in `localStorage` under `sa_token`, shared across tabs, and
+persists until the user signs out.
 
 ```
-POST https://solar-assistant.io/api/v1/sign_in   { email, password }
+POST https://solar-assistant.io/api/v1/sign_in   { email, password, organization_id }
   ->  { token, user }
 ```
 
-`<sa-sites>` and `<sa-user>` read `sa_token` for their API calls. A `401`
-response clears the token and redirects to the page named by the component's
-`sign-in` attribute (default `/sign_in`), preserving where the user was via a
-`?return_to=` query param.
+`<sa-sign-in>` handles this flow for you. If you are using the API client directly,
+call this endpoint yourself and store the token.
 
-> The token lives in `localStorage`, so it's shared across tabs for the origin
-> and persists until the user signs out (it is never sent to the server).
+When a request returns `401`, the token has expired. Clear it and redirect the user
+to your sign-in page. `<sa-sites>` and `<sa-user>` do this automatically via their
+`sign-in` attribute.
 
-## Auth transfer (mobile app / SSO)
+```html
+<sa-sites sign-in="/sign_in"></sa-sites>
+```
 
-When you already hold a bearer token elsewhere — typically a native app that
-authenticated through the API — you don't want to prompt for a password again in
-a WebView. Instead, mint a short-lived, **single-use** `session_token` and open
-the sign-in page with it. `<sa-sign-in>` exchanges that for a real API token and
-redirects to `return_to`.
+## Auth transfer - from mobile or external app
 
-### Step 1 — mint a transfer token (server side, with your bearer)
+If a user is already signed into your app and you provide a link to your website,
+that link should open authenticated. Asking them to sign in again is a poor
+experience. Auth transfer solves this: your app mints a short-lived, single-use
+`session_token` and passes it to the sign-in page, which exchanges it for a real
+session. The user lands on your website already signed in.
+
+### Step 1 — mint a transfer token (from your mobile or external app)
 
 ```
 POST https://solar-assistant.io/api/v1/session
@@ -39,49 +38,26 @@ POST https://solar-assistant.io/api/v1/session
 ```
 
 The API host is always `solar-assistant.io`, regardless of which branded site
-you're handing off to.
+you're handing off to. Note that `session_token` is short-lived and single-use —
+it is only for bootstrapping a session and is consumed on exchange. Mint a fresh
+one for each transfer.
 
-### Step 2 — open the sign-in page with the token
+### Step 2 — construct the sign-in URL with the token
 
 ```
 https://your-site.example/sign_in?token=<session_token>&return_to=/user
 ```
 
-`<sa-sign-in>` does the rest:
+Your sign-in page reads the token and exchanges it for a long-lived API token:
 
 ```
 reads token (hash or query)
   ->  POST https://solar-assistant.io/api/v1/sign_in   { session_token }
-  ->  { token }                       (the real, longer-lived API token)
+  ->  { token }
   ->  localStorage.sa_token = token
   ->  redirect to return_to
 ```
 
-### Where to put the token
-
-| Channel | Example | Notes |
-|---|---|---|
-| URL **hash** | `/sign_in#token=…&return_to=/user` | **Preferred** — the hash is never sent to the server, so the token stays out of access logs. |
-| URL **query** | `/sign_in?token=…&return_to=/user` | Fallback — works, but the token reaches the server and may appear in logs. |
-
-`return_to` is normalized to start with `/`.
-
-### Token types
-
-Two different tokens are involved — don't confuse them:
-
-| Token | Field name | Lifetime | Purpose |
-|---|---|---|---|
-| API token (bearer) | `token` | long-lived | Authenticates every API request (`Authorization: Bearer …`). Stored as `sa_token`. |
-| Transfer token | `session_token` | short-lived, **single-use** | Only used to bootstrap a browser session. Consumed (deleted) on exchange. |
-
-Because the `session_token` is single-use and short-lived, mint a fresh one for
-each transfer. If it's missing, expired, or already used, `<sa-sign-in>` falls
-back to showing the normal sign-in form.
-
-### Precedence
-
-An auth-transfer token always wins over an existing session: opening
-`/sign_in?token=…` while already signed in re-signs the user in with the new
-token rather than passing them straight through. This lets the app switch
-accounts cleanly.
+`<sa-sign-in>` handles this exchange automatically. If you are using the API
+client directly, perform these steps yourself. If the `session_token` is missing,
+expired, or already used, fall back to showing the normal sign-in form.

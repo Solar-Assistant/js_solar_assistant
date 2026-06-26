@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+  <script>
+    // Hide page chrome when opened inside the SolarAssistant Android app.
+    if (navigator.userAgent.includes('SolarAssistant'))
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('embedded')
+        document.querySelectorAll('sa-sign-in, sa-sites, sa-user')
+          .forEach(el => el.classList.add('embedded'))
+      })
+  </script>
+  <script type="module" src="https://cdn.solar-assistant.io/solar-assistant.js"></script>
+</head>
+<body>
+  <header class="site-header hide-android">
+    <div class="header-inner">
+      <a class="header-logo" href="/sites">
+        <img src="/assets/logo.svg" alt="Your organization" />
+      </a>
+      <nav class="header-nav">
+        <a href="/sites">Sites</a>
+        <span class="header-separator" aria-hidden="true"></span>
+        <a class="header-account" href="/user" aria-label="Account">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28">
+            <circle cx="32" cy="32" r="31" fill="var(--sa-accent)" />
+            <path fill="var(--sa-primary)" d="M56.877,50.4748a31.0647,31.0647,0,0,0-49.7651-.0156,30.9669,30.9669,0,0,0,49.7651.0156Z" />
+            <circle cx="32" cy="22" r="12" fill="var(--sa-primary)" />
+          </svg>
+        </a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <sa-user sign-in="/sign_in"></sa-user>
+  </main>
+</body>
+</html>

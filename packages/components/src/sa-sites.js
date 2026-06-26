@@ -1,4 +1,4 @@
-import { apiClient, siteUrl, inviteRoles } from '@solar-assistant/api'
+import { apiClient, siteUrl, inviteRoles, readToken, clearSession } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
 
 const template = `
@@ -19,14 +19,15 @@ const template = `
     td.buttons { text-align: right; white-space: nowrap; }
     .btn {
       padding: 5px 12px;
-      border: 1px solid var(--sa-border, #d1d5db);
+      border: none;
       border-radius: var(--sa-radius, 6px);
       font-size: 13px;
       cursor: pointer;
-      background: #fff;
-      color: #374151;
+      background: var(--sa-primary, #f97316);
+      color: #fff;
+      text-decoration: none;
     }
-    .btn:hover { border-color: var(--sa-primary, #f97316); color: var(--sa-primary, #f97316); }
+    .btn:hover { opacity: 0.85; }
 
     /* Detail */
     .heading {
@@ -147,7 +148,7 @@ function formatDate(iso) {
 
 class SaSites extends HTMLElement {
   connectedCallback() {
-    const token = localStorage.getItem('sa_token')
+    const token = readToken('sa_token')
     if (!token) {
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
@@ -192,7 +193,7 @@ class SaSites extends HTMLElement {
   async _fetchSites() {
     const res = await this._api.get('/sites')
     if (res.status === 401) {
-      localStorage.removeItem('sa_token')
+      clearSession('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
       return
@@ -202,7 +203,21 @@ class SaSites extends HTMLElement {
 
   async _renderList() {
     const list = this.shadowRoot.querySelector('.list')
-    list.innerHTML = ''
+    const bar = (w) => `<span style="display:inline-block;width:${w}px;height:0.8em;background:#e5e7eb;border-radius:3px;vertical-align:middle"></span>`
+    const skeletonRow = (nw, ow) => `<tr><td>${bar(nw)}</td><td>${bar(ow)}</td><td></td></tr>`
+    list.innerHTML = `
+      <h1 style="margin:0 0 16px;font-size:24px;font-weight:700">Sites</h1>
+      <div class="card"><div class="card-section">
+        <table class="sites-table">
+          <thead><tr><td>Name</td><td>Owner</td><td></td></tr></thead>
+          <tbody>
+            ${skeletonRow(140, 90)}
+            ${skeletonRow(110, 100)}
+            ${skeletonRow(160, 80)}
+          </tbody>
+        </table>
+      </div></div>
+    `
 
     if (!this._sites.length) await this._fetchSites()
 
@@ -246,12 +261,28 @@ class SaSites extends HTMLElement {
 
   async _loadSite(id) {
     const list = this.shadowRoot.querySelector('.list')
-    list.innerHTML = ''
+    const bar = (w) => `<span style="display:inline-block;width:${w}px;height:0.8em;background:#e5e7eb;border-radius:3px;vertical-align:middle"></span>`
+    const skeletonField = (lw, vw) => `<div class="form-field"><label>${bar(lw)}</label><div class="form-value">${bar(vw)}</div></div>`
+    list.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 16px">
+        <h1 style="margin:0;font-size:24px;font-weight:700">
+          <span class="breadcrumb hide-android"><a class="back">Sites</a> › </span>${bar(140)}
+        </h1>
+      </div>
+      <div class="card"><div class="card-section">
+        ${skeletonField(60, 130)}
+        ${skeletonField(72, 180)}
+        ${skeletonField(54, 110)}
+        ${skeletonField(52, 95)}
+        ${skeletonField(46, 140)}
+      </div></div>
+    `
+    list.querySelector('.back')?.addEventListener('click', () => { location.hash = '' })
 
     try {
       const siteRes = await this._api.get(`/sites/${id}`)
       if (siteRes.status === 401) {
-        localStorage.removeItem('sa_token')
+        clearSession('sa_token')
         window.location.href = this.getAttribute('sign-in') || '/sign_in'
         return
       }
@@ -279,7 +310,7 @@ class SaSites extends HTMLElement {
           <h1 style="margin:0;font-size:24px;font-weight:700">
             <span class="breadcrumb hide-android"><a class="back">Sites</a> › </span>${name}
           </h1>
-          ${siteUrl(site) ? `<a class="connect hide-android" href="${siteUrl(site)}" target="_blank">Connect →</a>` : ''}
+          ${siteUrl(site) ? `<a class="btn hide-android" href="${siteUrl(site)}" target="_blank">Connect →</a>` : ''}
         </div>
 
         <div class="card">
@@ -295,7 +326,7 @@ class SaSites extends HTMLElement {
         ${registered(site) ? `
         <div class="heading">
           User access
-          <button class="btn" data-invite="${id}">+ Invite user</button>
+          <button class="btn" data-invite="${id}">Invite user</button>
         </div>
         <div class="card">
           <div class="card-section">

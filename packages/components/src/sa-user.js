@@ -1,4 +1,4 @@
-import { apiClient } from '@solar-assistant/api'
+import { apiClient, readToken, clearSession } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
 
 const template = `
@@ -20,15 +20,16 @@ const template = `
     .label { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
     .value { font-size: 15px; color: #111827; }
     .btn {
-      padding: 8px 16px;
-      border: 1px solid var(--sa-border, #d1d5db);
+      padding: 5px 12px;
+      border: none;
       border-radius: var(--sa-radius, 6px);
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
-      background: #fff;
-      color: #374151;
+      background: var(--sa-primary, #f97316);
+      color: #fff;
+      text-decoration: none;
     }
-    .btn:hover { border-color: var(--sa-primary, #f97316); color: var(--sa-primary, #f97316); }
+    .btn:hover { opacity: 0.85; }
     :host(.embedded) .hide-android { display: none; }
   </style>
   <div class="heading-row hide-android">
@@ -45,7 +46,7 @@ const template = `
 
 class SaUser extends HTMLElement {
   connectedCallback() {
-    const token = localStorage.getItem('sa_token')
+    const token = readToken('sa_token')
     if (!token) {
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
@@ -59,7 +60,7 @@ class SaUser extends HTMLElement {
     this._load()
 
     this.shadowRoot.getElementById('sign-out').addEventListener('click', () => {
-      localStorage.removeItem('sa_token')
+      clearSession('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = signIn
     })
@@ -68,7 +69,7 @@ class SaUser extends HTMLElement {
   async _load() {
     const res = await this._api.get('/user')
     if (res.status === 401) {
-      localStorage.removeItem('sa_token')
+      clearSession('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
       window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
       return

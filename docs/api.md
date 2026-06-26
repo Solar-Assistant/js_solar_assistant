@@ -1,24 +1,69 @@
 # API reference
 
-The `@solar-assistant/api` client is a thin wrapper over the Solar Assistant
+The `@solar-assistant/api` client is a thin wrapper over the SolarAssistant
 REST API. Use it to build your own UI instead of (or alongside) the
-[components](../README.md).
+[components](components.md).
+
+## Example usage
 
 ```js
-import { apiClient, siteUrl, inviteRoles } from '@solar-assistant/api'
+import { apiClient, persistSession } from '@solar-assistant/api'
 
-const api = apiClient(localStorage.getItem('sa_token'))
+// Login
+const res = await fetch('https://solar-assistant.io/api/v1/sign_in', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password, organization_id }),
+})
+const { token, expires_at } = await res.json()
+persistSession(localStorage, 'sa_cloud', token, expires_at)
+
+// Create client
+const api = apiClient(token)
+
+// Get sites
 const sites = await (await api.get('/sites')).json()
+console.log(sites)
 ```
 
-## Client
+For the auth transfer flow (passing a session from a mobile or external app), see
+[Authentication](authentication.md).
+
+## Persisting the session
+
+After a successful login, persist the token and expiry with `persistSession`:
+
+```js
+import { persistSession, sessionValid } from '@solar-assistant/api'
+
+persistSession(localStorage, 'sa_cloud', token, expires_at)
+```
+
+On your sign-in page, use `sessionValid` to check for an existing, unexpired
+session and redirect away if the user is already signed in:
+
+```js
+if (sessionValid(localStorage, 'sa_cloud')) {
+  window.location.href = '/sites'
+}
+```
+
+A `401` response from any API call means the token has expired. Redirect to
+sign-in:
+
+```js
+if (res.status === 401) {
+  window.location.href = '/sign_in'
+}
+```
+
+## Client reference
 
 ### `apiClient(token)`
 
-Returns a client bound to a bearer token (stored in `localStorage` as
-`sa_token` after sign-in). Every method returns a `fetch` `Response` — call
-`.json()` to parse the body. A `401` means the token is expired; redirect to
-sign-in.
+Returns a client bound to a bearer token. Every method returns a `fetch`
+`Response` — call `.json()` to parse the body. A `401` means the token is
+expired; redirect to sign-in.
 
 | Method | Signature |
 |---|---|
@@ -26,13 +71,6 @@ sign-in.
 | `post` | `post(path, body)` |
 | `patch` | `patch(path, body)` |
 | `delete` | `delete(path)` |
-
-### Base URL
-
-Environment-aware:
-
-- Development (`import.meta.env.DEV`): `http://localhost:3000/api/v1`
-- Production: `https://solar-assistant.io/api/v1`
 
 ### Query parameters (`get`)
 
@@ -78,7 +116,7 @@ Fields: `id`, `email`, `first_name`, `last_name`, `role` (`owner` | `admin` |
 
 ### `POST /sites/:id/users`
 
-Invite a user to the site. Creates the account if the email isn't found.
+Invite a user to the site. Creates the account if the email is not found.
 Body: `{ email, first_name, last_name, role }` where `role` is `member` (Viewer)
 or `admin` (Admin).
 
@@ -95,16 +133,11 @@ Remove a user from the site.
 Returns a short-lived token and connection details for a site's WebSocket.
 Response: `{ host, site_id, site_name, site_key, token, local_ip }`.
 
-### `POST /session` and `POST /sign_in`
-
-Used for the auth transfer flow — see
-[Authentication & auth transfer](authentication.md).
-
 ## Helpers
 
 ### `siteUrl(site)`
 
-Returns the URL of a site's Solar Assistant dashboard:
+Returns the URL of a site's SolarAssistant dashboard:
 
 ```
 https://<name>.<region>.solar-assistant.io
