@@ -1,12 +1,14 @@
 # Default example site
 
 A complete, self-contained portal built from the SolarAssistant web components —
-sign in, list sites, view a site, invite users, and manage the account. Copy this
-folder, replace the placeholders below, and serve it as a static site.
+sign in, create account, list sites, view a site, invite users, and manage the
+account. Copy this folder, replace the placeholders below, and serve it as a
+static site.
 
 ```
 index.html      redirects to /sign_in
 sign_in.html    <sa-sign-in>
+register.html   <sa-register>
 sites.html      <sa-sites>
 user.html       <sa-user>
 assets/
@@ -14,11 +16,14 @@ assets/
   logo.svg      your logo (placeholder included)
 ```
 
+You must also serve a `/terms` page with your terms and conditions —
+`<sa-register>` links to it.
+
 ## Replace these placeholders
 
 | Placeholder | Where | What to put |
 |---|---|---|
-| `YOUR_ORG_ID` | `sign_in.html` (`organization-id`) | Your SolarAssistant organization id |
+| `YOUR_ORG_ID` | `sign_in.html`, `register.html` (`organization-id`) | Your SolarAssistant organization id |
 | `Your organization` | `alt="…"` on each logo | Your organization name |
 | `assets/logo.svg` | — | Your logo |
 | `--sa-primary` / `--sa-accent` | `assets/style.css` | Your brand colour and a soft tint |
@@ -26,7 +31,7 @@ assets/
 The components load from the CDN, so there is no build step:
 
 ```html
-<script type="module" src="https://cdn.solar-assistant.io/solar-assistant.js"></script>
+<script type="module" src="https://cdn.solar-assistant.io/js/solar-assistant.js"></script>
 ```
 
 ## Serving

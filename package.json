@@ -1,6 +1,7 @@
 {
   "name": "js_solar_assistant",
   "private": true,
+  "license": "Apache-2.0",
   "workspaces": ["packages/*"],
   "devDependencies": {
     "vite": "^5.0.0"

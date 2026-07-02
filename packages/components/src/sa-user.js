@@ -1,7 +1,9 @@
 import { apiClient, readToken, clearSession } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
+import { t } from './i18n.js'
 
-const template = `
+function makeTemplate() {
+  return `
   <style>
     :host { display: block; font-family: inherit; }
     ${cardStyles}
@@ -33,16 +35,17 @@ const template = `
     :host(.embedded) .hide-android { display: none; }
   </style>
   <div class="heading-row hide-android">
-    <h1 class="heading">My account</h1>
-    <button class="btn" id="sign-out">Sign out</button>
+    <h1 class="heading">${t('my_account')}</h1>
+    <button class="btn" id="sign-out">${t('sign_out')}</button>
   </div>
   <div class="card"><div class="card-section">
-    <div class="field"><div class="label">First name</div><div class="value" id="first-name"></div></div>
-    <div class="field"><div class="label">Last name</div><div class="value" id="last-name"></div></div>
-    <div class="field"><div class="label">Email</div><div class="value" id="email"></div></div>
-    <div class="field"><div class="label">Phone number</div><div class="value" id="phone-number"></div></div>
+    <div class="field"><div class="label">${t('first_name')}</div><div class="value" id="first-name"></div></div>
+    <div class="field"><div class="label">${t('last_name')}</div><div class="value" id="last-name"></div></div>
+    <div class="field"><div class="label">${t('email')}</div><div class="value" id="email"></div></div>
+    <div class="field"><div class="label">${t('phone_number')}</div><div class="value" id="phone-number"></div></div>
   </div></div>
 `
+}
 
 class SaUser extends HTMLElement {
   connectedCallback() {
@@ -54,7 +57,7 @@ class SaUser extends HTMLElement {
     }
 
     this.attachShadow({ mode: 'open' })
-    this.shadowRoot.innerHTML = template
+    this.shadowRoot.innerHTML = makeTemplate()
     this._api = apiClient(token)
 
     this._load()

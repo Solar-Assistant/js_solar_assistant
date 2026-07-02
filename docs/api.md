@@ -4,6 +4,12 @@ The `@solar-assistant/api` client is a thin wrapper over the SolarAssistant
 REST API. Use it to build your own UI instead of (or alongside) the
 [components](components.md).
 
+This page covers the JS client. For the REST API itself — every endpoint,
+parameter, and response — see the canonical sources:
+
+- **OpenAPI spec:** [solar-assistant.io/openapi.yaml](https://solar-assistant.io/openapi.yaml) (machine-readable)
+- **Cloud API guide:** [solar-assistant.io/help/integration/cloud-api](https://solar-assistant.io/help/integration/cloud-api) (including proxy pass-through metrics and the WebSocket stream)
+
 ## Example usage
 
 ```js
@@ -31,31 +37,42 @@ For the auth transfer flow (passing a session from a mobile or external app), se
 
 ## Persisting the session
 
-After a successful login, persist the token and expiry with `persistSession`:
+After a successful login, persist the token and its expiry with `persistSession`.
+Pass the storage you want: `localStorage` to keep the user signed in across
+browser restarts, or `sessionStorage` to drop the session when the tab closes —
+that choice is how a "keep me signed in" checkbox is implemented.
 
 ```js
-import { persistSession, sessionValid } from '@solar-assistant/api'
+import { persistSession, readToken, clearSession } from '@solar-assistant/api'
 
-persistSession(localStorage, 'sa_cloud', token, expires_at)
+const storage = rememberMe ? localStorage : sessionStorage
+persistSession(storage, 'sa_cloud', token, expires_at)
 ```
 
-On your sign-in page, use `sessionValid` to check for an existing, unexpired
-session and redirect away if the user is already signed in:
+On your sign-in page, use `readToken` to check for an existing, unexpired session
+— it looks in both `sessionStorage` and `localStorage` — and redirect away if the
+user is already signed in:
 
 ```js
-if (sessionValid(localStorage, 'sa_cloud')) {
+if (readToken('sa_cloud')) {
   window.location.href = '/sites'
 }
 ```
 
-A `401` response from any API call means the token has expired. Redirect to
-sign-in:
+A `401` response from any API call means the token has expired. Clear it and
+redirect to sign-in:
 
 ```js
 if (res.status === 401) {
+  clearSession('sa_cloud')
   window.location.href = '/sign_in'
 }
 ```
+
+> **Interoperating with the components.** The built-in components (`<sa-sign-in>`,
+> `<sa-sites>`, `<sa-user>`) store the session under `'sa_token'`. If you want to
+> read that session from your own code — for example to call the API on a page that
+> also embeds `<sa-sites>` — use `readToken('sa_token')`.
 
 ## Client reference
 
@@ -87,51 +104,32 @@ api.get('/sites', { inverter: 'srne', limit: 50 })
 //  -> /sites?q=inverter:srne&limit=50
 ```
 
-## Endpoints
+## Session helpers
 
-### `GET /user`
+These manage the token in browser storage under a key you choose (e.g.
+`'sa_cloud'`); each stores the expiry under `<key>_expires_at`.
 
-Returns the current authenticated user.
-Fields: `id`, `email`, `first_name`, `last_name`, `locale`, `phone_number`.
+### `persistSession(storage, key, token, expiresAt)`
 
-### `GET /sites`
+Writes `token` and `expiresAt` to the given `Storage` (`localStorage` or
+`sessionStorage`).
 
-Returns the sites the user has access to.
-Supported filter keys: `name`, `inverter`, `battery`,
-`inverter_params_output_power`, `last_seen_after`, `build_date_after`, `limit`,
-`offset`, `search`.
-Fields: `id`, `name`, `description`, `inverter`, `battery`, `board`, `local_ip`,
-`build_date`, `last_seen_at`, `proxy`, `owner { id, email, first_name, last_name }`.
+### `sessionValid(storage, key)`
 
-### `GET /sites/:id`
+Returns `true` if `storage` holds a token whose expiry is still in the future. If
+no parseable expiry was stored, it falls back to "token present".
 
-Returns a single site, including its `users` array (same shape as
-`GET /sites/:id/users`), so a detail view needs only this one call.
+### `readToken(key)`
 
-### `GET /sites/:id/users`
+Returns a valid token from `sessionStorage` or `localStorage` (sessionStorage
+first), or `null` if neither holds a live session. Use this for the "am I signed
+in?" check when you offer a "keep me signed in" option, since the token may live
+in either storage.
 
-Returns users with access to the site.
-Fields: `id`, `email`, `first_name`, `last_name`, `role` (`owner` | `admin` |
-`member`). Note: `member` is displayed as **Viewer** in the UI.
+### `clearSession(key)`
 
-### `POST /sites/:id/users`
-
-Invite a user to the site. Creates the account if the email is not found.
-Body: `{ email, first_name, last_name, role }` where `role` is `member` (Viewer)
-or `admin` (Admin).
-
-### `PATCH /sites/:id/users/:user_id`
-
-Update a user's role. Body: `{ role }` (`member` | `admin`).
-
-### `DELETE /sites/:id/users/:user_id`
-
-Remove a user from the site.
-
-### `POST /sites/:id/authorize`
-
-Returns a short-lived token and connection details for a site's WebSocket.
-Response: `{ host, site_id, site_name, site_key, token, local_ip }`.
+Removes the token and its expiry from **both** `sessionStorage` and
+`localStorage`. Use it on sign-out and on a `401`.
 
 ## Helpers
 
@@ -145,6 +143,25 @@ https://<name>.<region>.solar-assistant.io
 
 where `region` is the first segment of the `proxy` field (e.g. `eu` from
 `eu-aws-1`). Returns `null` if the site has no `name` or `proxy`.
+
+### `showErrors(root, errors)`
+
+Injects field-level validation errors into a form inside a shadow root.
+`errors` is the `{ field: [messages] }` object from a `422` API response.
+For each field key it finds the matching `<input name="field">`, creates a
+`.field-error` span, and inserts it after the input (or its containing `<label>`).
+Returns a string of any leftover errors whose field name had no matching input,
+suitable for a catch-all error paragraph.
+
+```js
+const SA = 'https://cdn.solar-assistant.io/js/solar-assistant.js'
+const { showErrors } = await import(SA)
+
+// inside an outlet's _submit:
+const body = await res.json()
+const leftover = showErrors(this.shadowRoot, body.errors)
+if (leftover) errorEl.textContent = leftover
+```
 
 ### `inviteRoles(site, currentUser)`
 

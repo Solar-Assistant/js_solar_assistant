@@ -20,7 +20,7 @@
           .forEach(el => el.classList.add('embedded'))
       })
   </script>
-  <script type="module" src="https://cdn.solar-assistant.io/solar-assistant.js"></script>
+  <script type="module" src="https://cdn.solar-assistant.io/js/solar-assistant.js"></script>
 </head>
 <body>
   <header class="site-header hide-android">
@@ -34,6 +34,7 @@
     <h1>Sign in</h1>
     <!-- Replace YOUR_ORG_ID with your SolarAssistant organization id. -->
     <sa-sign-in organization-id="YOUR_ORG_ID" return-to="/sites"></sa-sign-in>
+    <p class="page-note">Don't have an account? <a href="/register">Create one</a></p>
   </main>
 </body>
 </html>

@@ -22,3 +22,18 @@ export const cardStyles = `
     justify-content: flex-end;
   }
 `
+
+export const accentBlockStyles = `
+  .accent-block {
+    background: #eef2ff;
+    border-radius: var(--sa-radius, 6px);
+    padding: 32px 24px;
+    text-align: center;
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .accent-block p { margin: 0 0 8px; }
+  .accent-block p:last-child { margin: 0; }
+  .accent-block a { color: var(--sa-primary, #f97316); }
+`

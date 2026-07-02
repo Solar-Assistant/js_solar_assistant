@@ -1,18 +1,8 @@
-export const BASE = import.meta.env.DEV
-  ? 'http://localhost:3000/api/v1'
-  : 'https://solar-assistant.io/api/v1'
+export const BASE = 'https://solar-assistant.io/api/v1'
 
 // Returns an API client bound to a bearer token.
-// Token is stored in localStorage under 'sa_token' after sign-in.
-//
-//   const api = apiClient(localStorage.getItem('sa_token'))
-//   const sites = await api.get('/sites')
-//
 // All methods return a Response (call .json() to parse). A 401 means the token
-// is expired — redirect to sign-in.
-//
-// Full client, query-encoding, and endpoint reference:
-//   https://github.com/Solar-Assistant/js_solar_assistant/blob/master/docs/api.md
+// is expired — redirect to sign-in. See docs/api.md for the full reference.
 
 const PAGINATION_KEYS = new Set(['limit', 'offset'])
 

@@ -99,3 +99,19 @@ h1 {
   font-weight: 600;
   margin-bottom: 24px;
 }
+
+.page-note {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.page-note a {
+  color: var(--sa-primary);
+  text-decoration: none;
+}
+
+.page-note a:hover {
+  text-decoration: underline;
+}

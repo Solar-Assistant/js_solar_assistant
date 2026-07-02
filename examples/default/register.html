@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Account</title>
+  <title>Create account</title>
   <link rel="stylesheet" href="/assets/style.css" />
   <script>
     // Hide page chrome when opened inside the SolarAssistant Android app.
@@ -19,24 +19,17 @@
 <body>
   <header class="site-header hide-android">
     <div class="header-inner">
-      <a class="header-logo" href="/sites">
+      <a class="header-logo" href="/sign_in">
         <img src="/assets/logo.svg" alt="Your organization" />
       </a>
-      <nav class="header-nav">
-        <a href="/sites">Sites</a>
-        <span class="header-separator" aria-hidden="true"></span>
-        <a class="header-account" href="/user" aria-label="Account">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28">
-            <circle cx="32" cy="32" r="31" fill="var(--sa-accent)" />
-            <path fill="var(--sa-primary)" d="M56.877,50.4748a31.0647,31.0647,0,0,0-49.7651-.0156,30.9669,30.9669,0,0,0,49.7651.0156Z" />
-            <circle cx="32" cy="22" r="12" fill="var(--sa-primary)" />
-          </svg>
-        </a>
-      </nav>
     </div>
   </header>
-  <main>
-    <sa-user sign-in="/sign_in"></sa-user>
+  <main class="centered">
+    <h1>Create account</h1>
+    <!-- Replace YOUR_ORG_ID with your SolarAssistant organization id. -->
+    <!-- You must also serve a /terms page — <sa-register> links to it. -->
+    <sa-register organization-id="YOUR_ORG_ID" sign-in="/sign_in"></sa-register>
+    <p class="page-note">Already have an account? <a href="/sign_in">Sign in</a></p>
   </main>
 </body>
 </html>

@@ -1,17 +1,20 @@
 # Authentication
 
 The SolarAssistant API uses bearer tokens. A user signs in with email and password,
-receives a token, and that token is included in every subsequent API request. The
-token is stored in `localStorage` under `sa_token`, shared across tabs, and
-persists until the user signs out.
+receives a token, and that token is included in every subsequent API request. The token is stored in the
+browser under `sa_token` — in `localStorage` to keep the user signed in across
+restarts, or `sessionStorage` to drop it when the tab closes (a "keep me signed
+in" choice). The response also includes an `expires_at` you can store to know
+when the token lapses.
 
 ```
 POST https://solar-assistant.io/api/v1/sign_in   { email, password, organization_id }
-  ->  { token, user }
+  ->  { token, expires_at, user: { id, email, first_name, last_name, locale, phone_number } }
 ```
 
 `<sa-sign-in>` handles this flow for you. If you are using the API client directly,
-call this endpoint yourself and store the token.
+call this endpoint yourself and store the token. The `user.locale` field is used to
+apply the right language automatically — see [Locale and translations](i18n.md).
 
 When a request returns `401`, the token has expired. Clear it and redirect the user
 to your sign-in page. `<sa-sites>` and `<sa-user>` do this automatically via their
@@ -53,8 +56,8 @@ Your sign-in page reads the token and exchanges it for a long-lived API token:
 ```
 reads token (hash or query)
   ->  POST https://solar-assistant.io/api/v1/sign_in   { session_token }
-  ->  { token }
-  ->  localStorage.sa_token = token
+  ->  { token, expires_at, user: { locale, … } }
+  ->  persistSession(localStorage, 'sa_token', token, expires_at)
   ->  redirect to return_to
 ```
 
