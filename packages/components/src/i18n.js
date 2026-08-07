@@ -22,6 +22,12 @@ const MESSAGES = {
     pending_confirmation: 'Account pending confirmation. Please check your email.',
     invalid_credentials: 'Invalid email or password.',
 
+    // Opening a site (to_site). One message covers both "no such site" and "not
+    // yours": which of the two it is isn't the visitor's business, and saying
+    // would confirm that a site by that name exists.
+    site_unavailable: 'That site is not available on this account.',
+    go_to_sites: 'Go to your sites',
+
     // Forgot password
     reset_password: 'Reset password',
     reset_sub: "We'll email you a link to set a new password.",

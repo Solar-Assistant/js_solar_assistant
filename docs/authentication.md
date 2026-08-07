@@ -64,3 +64,51 @@ reads token (hash or query)
 `<sa-sign-in>` handles this exchange automatically. If you are using the API
 client directly, perform these steps yourself. If the `session_token` is missing,
 expired, or already used, fall back to showing the normal sign-in form.
+
+## Opening a site - `to_site`
+
+A site is served from its own host, and a visitor who arrives there without a
+valid session is sent to your sign-in page to get one:
+
+```
+https://your-site.example/sign_in?to_site=https%3A%2F%2Fplant.us.solar-assistant.io%2Fdashboard
+```
+
+Signing a user in is not enough on its own. The site is a separate host with its
+own session, so it has to be handed a token minted for it specifically. Once a
+session exists, `<sa-sign-in>` resolves the site and does that exchange:
+
+```
+GET  /sites?q=name:plant            ->  [{ "id": 4821, "name": "plant", … }]
+POST /sites/4821/authorize          ->  { token, site_key, site_host, … }
+  ->  redirect to
+      https://<site_host>/callback?token=<token>&key=<site_key>&return_to=<path>
+```
+
+The site's name is the first label of its host. The listing is scoped to what
+the signed-in user may see, so a host naming no site they have access to simply
+resolves to nothing, and the visitor is told the site is unavailable.
+
+If there is no session yet the sign-in form is shown first, and the exchange
+runs once they are signed in - the visitor never has to come back to the link.
+
+### `to_*` parameters in general
+
+`to_site` is the first of a family. A `to_*` parameter names a **target** to act
+on once a session exists; it is not a page to return to, which is what
+`return_to` is for. The distinction is worth keeping:
+
+| parameter | value | meaning |
+|---|---|---|
+| `return_to` | a path within your portal | where to send the browser afterwards |
+| `to_*` | identifies a target | what to go and do, then send them there |
+
+The rule that makes this safe is that **a `to_*` never supplies a destination**.
+It names something to look up; where the browser is finally sent comes back from
+the API - above, `site_host` as returned, never the host that arrived in the URL.
+Keep that property if you implement the flow yourself, and validate `return_to`
+as a path within your own site.
+
+Two more, for forward compatibility: at most one `to_*` may be present, and an
+unrecognised one is ignored rather than treated as an error - a page whose
+components bundle predates a parameter falls back to an ordinary sign-in.
