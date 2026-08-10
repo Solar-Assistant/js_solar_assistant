@@ -1,0 +1,8 @@
+SolarAssistant Web Integration Kit
+Copyright (c) SolarAssistant
+
+The Apache License 2.0 in this repository applies solely to the web integration
+kit — the web components and the API client. The portal templates live in their
+own repositories and carry the same licence. It does not cover the SolarAssistant
+platform, including the downloadable device software and cloud infrastructure,
+which are proprietary and distributed under separate terms.
