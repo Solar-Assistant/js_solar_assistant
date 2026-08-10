@@ -57,7 +57,7 @@ class SaSignIn extends HTMLElement {
     const query = new URLSearchParams(window.location.search)
     const sessionToken = hashParams.get('token') || query.get('token')
     if (sessionToken) {
-      const returnTo = hashParams.get('return_to') || this._returnTo()
+      const returnTo = this._samePage(hashParams.get('return_to')) || this._returnTo()
       this._spinner()
       this._exchange(sessionToken, returnTo)
       return
@@ -72,9 +72,38 @@ class SaSignIn extends HTMLElement {
     if (this._onHash) window.removeEventListener('hashchange', this._onHash)
   }
 
+  // `return_to` as somewhere we are willing to send a browser, or null.
+  //
+  // It arrives in the URL, so anyone can put anything in it, and it is followed
+  // straight after the visitor has typed their password — on a partner's own
+  // branded domain, where a link to somewhere else is far more convincing than
+  // it would be from an unfamiliar one. So it is held to a path within this
+  // portal, and anything else falls back rather than being followed.
+  //
+  // Nothing legitimate is lost by that: the one destination that genuinely lives
+  // on another origin is the site a visitor was redirected from, and that
+  // arrives as `to_site` and is resolved through the API instead of being
+  // followed as given.
+  _samePage(value) {
+    if (!value) return null
+    let url
+    // Resolved against this page, so a bare path stays a path while an absolute
+    // URL — or a scheme-relative `//host`, or a `javascript:` — keeps its own
+    // origin to be compared and rejected.
+    try {
+      url = new URL(value, window.location.href)
+    } catch {
+      return null
+    }
+    if (url.origin !== window.location.origin) return null
+    return `${url.pathname}${url.search}${url.hash}`
+  }
+
+  // The `return-to` attribute is not checked: it is the portal author's own
+  // markup, not something a visitor can set.
   _returnTo() {
     const query = new URLSearchParams(window.location.search)
-    return query.get('return_to') || this.getAttribute('return-to') || '/sites'
+    return this._samePage(query.get('return_to')) || this.getAttribute('return-to') || '/sites'
   }
 
   // The site a `to_site` parameter names, or null.

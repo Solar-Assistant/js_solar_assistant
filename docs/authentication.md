@@ -106,9 +106,27 @@ on once a session exists; it is not a page to return to, which is what
 The rule that makes this safe is that **a `to_*` never supplies a destination**.
 It names something to look up; where the browser is finally sent comes back from
 the API - above, `site_host` as returned, never the host that arrived in the URL.
-Keep that property if you implement the flow yourself, and validate `return_to`
-as a path within your own site.
+Keep that property if you implement the flow yourself.
 
 Two more, for forward compatibility: at most one `to_*` may be present, and an
 unrecognised one is ignored rather than treated as an error - a page whose
 components bundle predates a parameter falls back to an ordinary sign-in.
+
+### `return_to` must stay on your own site
+
+`<sa-sign-in>` will only follow a `return_to` that resolves to a path on the page's
+own origin. A cross-origin value - `https://elsewhere.example/`, a scheme-relative
+`//elsewhere.example/`, a `javascript:` URL, or even your own host over plain
+`http` - is discarded, and the visitor goes to the `return-to` attribute or
+`/sites` instead. A same-origin absolute URL is accepted and reduced to its path.
+
+This matters because `return_to` is read from the URL, so anyone can put anything
+in it, and it is followed immediately after the visitor has typed their password.
+On your own branded domain a link onward to somewhere else is far more convincing
+to your customers than the same link would be from a domain they don't know.
+
+Nothing legitimate is lost: the one destination that really is on another origin
+is the site a visitor was redirected from, and that arrives as `to_site` and is
+resolved through the API rather than followed as given. If you implement sign-in
+yourself, apply the same rule - and note that the `return-to` **attribute** is not
+checked, because that is your own markup rather than something a visitor can set.
