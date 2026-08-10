@@ -1,12 +1,26 @@
 # SolarAssistant: Web Integration Kit
 
-SolarAssistant gives every organization a choice of ready-made **cloud web portal**
-templates out of the box. This repository is for when you want to customize or
-build your own, integrating SolarAssistant sign-in, sites, and user management
-directly into a website you run (a custom site, **WordPress**, **Joomla**,
-Webflow, a **Lovable** app, plain HTML, and more — see
-[Integrating with your platform](docs/platforms.md)). We believe a custom web portal is an
-essential part of your solar business. [Read more on why we think so](docs/approach.md).
+Build a customer portal on SolarAssistant — sign in, their sites, their account — under your own
+brand.
+
+**You may not need this repository at all.** In SolarAssistant, open your organization's **Cloud
+portal** page, connect GitHub and pick a ready-made template. That repository *is* your live portal,
+carrying your name, colours and logo, with nothing to write and nothing to host.
+[`Solar-Assistant/portal-minimal`](https://github.com/Solar-Assistant/portal-minimal) is the one to
+start from.
+
+This repository is what those templates are built out of, for when you want to go further:
+
+| | |
+|---|---|
+| **Change the portal** | Fork a template and edit it. Connect the fork and it stays your live portal — still hosted by us. |
+| **Add it to a site you already have** | Drop the components into WordPress, Joomla, Webflow or anything else you run. See [Integrating with your platform](docs/platforms.md). |
+| **Build something new** | A **Lovable** app, any framework, or the API client with your own markup. |
+
+All three use the same web components and the same API, so moving between them is not a rewrite.
+
+We believe a custom web portal is an essential part of your solar business.
+[Read more on why we think so](docs/approach.md).
 
 ## Prerequisites
 
