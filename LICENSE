@@ -1,7 +1,8 @@
-This licence applies solely to the web integration kit (web components, API
-client, and templates) in this repository. It does not cover the SolarAssistant
-platform, including the downloadable device software and cloud infrastructure,
-which are proprietary and distributed under separate terms.
+This licence applies solely to the web integration kit (web components and API
+client) in this repository. The portal templates live in their own repositories
+and carry the same licence. It does not cover the SolarAssistant platform,
+including the downloadable device software and cloud infrastructure, which are
+proprietary and distributed under separate terms.
 
 ---
 
