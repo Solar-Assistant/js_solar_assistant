@@ -166,5 +166,15 @@ if (leftover) errorEl.textContent = leftover
 ### `inviteRoles(site, currentUser)`
 
 Returns the role options available when inviting a user:
-`['member', 'admin']`, plus `'owner'` when the current user owns the site
+`['viewer', 'admin']`, plus `'owner'` when the current user owns the site
 (transferring ownership).
+
+### `normalizeRole(role)`
+
+Maps a role read from the API onto the values above. Older deployments return
+`'member'` for a viewer where newer ones return `'viewer'`; this returns
+`'viewer'` for both and passes anything else through. Compare against this
+rather than against a raw `role` from a response.
+
+Writes are unaffected either way — the API treats anything that isn't `'admin'`
+or `'owner'` as a viewer — so an older portal sending `'member'` keeps working.

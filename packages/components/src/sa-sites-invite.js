@@ -32,7 +32,7 @@ class SaSitesInvite extends HTMLElement {
     const site = res.ok ? await res.json() : { id }
     const name = caption(site)
     const roles = inviteRoles(site, this.currentUser)
-    const roleLabel = { member: t('role_viewer'), admin: t('role_admin') }
+    const roleLabel = { viewer: t('role_viewer'), admin: t('role_admin') }
 
     view.innerHTML = `
       <h1 class="title">
@@ -60,7 +60,7 @@ class SaSitesInvite extends HTMLElement {
             <div class="role-radios">
               ${roles.map(val => [val, roleLabel[val] ?? val]).map(([val, label]) => `
                 <label>
-                  <input type="radio" name="invite-role" value="${val}" ${val === 'member' ? 'checked' : ''} class="invite-role" />
+                  <input type="radio" name="invite-role" value="${val}" ${val === 'viewer' ? 'checked' : ''} class="invite-role" />
                   ${label}
                 </label>`).join('')}
             </div>
@@ -88,7 +88,7 @@ class SaSitesInvite extends HTMLElement {
       email,
       first_name: view.querySelector('[name="first_name"]').value.trim(),
       last_name:  view.querySelector('[name="last_name"]').value.trim(),
-      role: view.querySelector('.invite-role:checked')?.value || 'member',
+      role: view.querySelector('.invite-role:checked')?.value || 'viewer',
     })
 
     if (res.ok) {

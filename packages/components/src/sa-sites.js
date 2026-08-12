@@ -14,11 +14,19 @@ import './sa-sites-register.js'
 //   (empty)            index       —
 //   #<id>              show        site-id
 //   #<id>/invite       invite      site-id
+//   #<id>/reset_password  resetPassword  site-id
+//   #local             local       —
+//   #activate?uid=…    activate    uid
 //   #register?uid=…    register    uid
 const ROUTES = [
   { test: h => h === '',                outlet: 'index' },
   { test: h => /^\d+$/.test(h),         outlet: 'show',     param: 'site-id', value: h => h },
   { test: h => /^\d+\/invite$/.test(h), outlet: 'invite',   param: 'site-id', value: h => h.split('/')[0] },
+  { test: h => /^\d+\/reset_password$/.test(h), outlet: 'resetPassword', param: 'site-id',
+    value: h => h.split('/')[0] },
+  { test: h => h === 'local',           outlet: 'local' },
+  { test: h => /^activate(\?|$)/.test(h), outlet: 'activate', param: 'uid',
+    value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
   { test: h => /^register(\?|$)/.test(h), outlet: 'register', param: 'uid',
     value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
 ]
@@ -40,6 +48,9 @@ class SaSites extends HTMLElement {
       show:     this.getAttribute('show')     || 'sa-sites-show',
       invite:   this.getAttribute('invite')   || 'sa-sites-invite',
       register: this.getAttribute('register') || 'sa-sites-register',
+      resetPassword: this.getAttribute('reset-password') || 'sa-sites-reset-password',
+      local:    this.getAttribute('local')    || 'sa-sites-local',
+      activate: this.getAttribute('activate') || 'sa-sites-activate',
     }
     this._mounted = {}
 
@@ -84,6 +95,7 @@ class SaSites extends HTMLElement {
       const el = document.createElement(tag)
       el.api = this._api
       el.currentUser = this._currentUser
+      el.organization = this.getAttribute('organization') || ''
       el.setAttribute('sign-in', this._signIn)
       el.classList.toggle('embedded', this.classList.contains('embedded'))
       this.appendChild(el)

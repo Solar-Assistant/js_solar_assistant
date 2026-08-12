@@ -39,11 +39,20 @@ export function apiClient(token) {
 }
 
 // Returns the role options available when inviting a user to a site.
-// Roles: 'member' (Viewer), 'admin' (Admin), 'owner' (transfers ownership, only if current user is owner).
+// Roles: 'viewer' (Viewer), 'admin' (Admin), 'owner' (transfers ownership, only if current user is owner).
+// The API used to read back 'member' for a viewer and now reads back 'viewer'. Writes accept either —
+// anything that isn't 'admin' or 'owner' is a viewer — so send 'viewer' and normalize on read.
 export function inviteRoles(site, currentUser) {
-  const base = ['member', 'admin']
+  const base = ['viewer', 'admin']
   if (currentUser && site.owner?.id === currentUser.id) return [...base, 'owner']
   return base
+}
+
+// A role as read from the API, mapped onto the values above. Older deployments return
+// 'member' where newer ones return 'viewer'; everything downstream should compare against
+// this rather than against a raw response value.
+export function normalizeRole(role) {
+  return role === 'member' ? 'viewer' : role
 }
 
 export function persistSession(storage, key, token, expiresAt) {

@@ -16,7 +16,7 @@ We believe a custom web portal is an essential part of your solar business.
 
 ## Prerequisites
 
-Configure the **Cloud host** on your SolarAssistant organization to your domain. Every site linked to your organization will provide the end user with links to your domain instead of solar-assistant.io. These are registering a site (`/sites/register`) and viewing a site (`/sites/:id`).
+Configure the **Cloud host** on your SolarAssistant organization to your domain. Every site linked to your organization then sends your customers to your domain rather than to solar-assistant.io — to register a site and to view one. Both land on your `/sites` page and are handled by `<sa-sites>`, so pointing Cloud host at your domain adds no pages beyond the [four you already serve](docs/customizing.md#required-paths).
 
 <img src="docs/org-config.png" width="340" alt="Organization branding and configuration in SolarAssistant"> <img src="docs/site-view.png" width="340" alt="Site detail view in SolarAssistant">
 

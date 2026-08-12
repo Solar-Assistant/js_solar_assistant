@@ -1,4 +1,4 @@
-import { siteUrl } from '@solar-assistant/api'
+import { siteUrl, normalizeRole } from '@solar-assistant/api'
 import { sitesStyles, field, caption, registered, formatDate, resolveApi, redirectToSignIn } from './sites-shared.js'
 import { t } from './i18n.js'
 
@@ -76,7 +76,7 @@ class SaSitesShow extends HTMLElement {
               <table>
                 <thead><tr><td>${t('name')}</td><td>${t('email')}</td><td>${t('role')}</td></tr></thead>
                 <tbody>
-                  ${users.map(u => `
+                  ${users.map(u => ({ ...u, role: normalizeRole(u.role) })).map(u => `
                     <tr data-user-id="${u.id}">
                       <td>${[u.first_name, u.last_name].filter(Boolean).join(' ') || '—'}</td>
                       <td>${u.email}</td>
@@ -84,7 +84,7 @@ class SaSitesShow extends HTMLElement {
                         ${u.role === 'owner'
                           ? `<select class="role-select" disabled><option selected>${t('role_owner')}</option></select>`
                           : `<select class="role-select" data-user-id="${u.id}" data-original="${u.role}">
-                               <option value="member" ${u.role === 'member' ? 'selected' : ''}>${t('role_viewer')}</option>
+                               <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>${t('role_viewer')}</option>
                                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>${t('role_admin')}</option>
                                <option value="none">${t('role_none')}</option>
                              </select>`

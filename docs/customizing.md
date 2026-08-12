@@ -37,26 +37,42 @@ element with your own implementation.
 | `sa-sites-show` | `GET /sites/:id`, `PATCH /sites/:id/users/:uid`, `DELETE /sites/:id/users/:uid` | `site-id` | `#` (back), `#<id>/invite` |
 | `sa-sites-invite` | `GET /sites/:id`, `POST /sites/:id/users` | `site-id` | `#<id>` on success/back |
 | `sa-sites-register` | `POST /sites/register` | `uid` | `#<id>` on success |
+| `sa-sites-reset-password` | `POST /sites/:id/authorize` | `site-id` | `#` (back) |
+| `sa-sites-local` | `GET /sites/local` | — | — |
+| `sa-sites-activate` | `POST /sites/request_activation` | `uid` | `#<id>` after sending |
 
 ## Required paths
 
-A custom portal must serve these paths. Solar Assistant sends emails and deep
-links that point to them, so they must exist and work on your domain.
+**Four pages, plus your own terms.** That is the whole contract. Solar Assistant
+sends emails and deep links into these pages, so they have to exist on your
+domain and carry the element shown.
 
-| Path | Page | Notes |
+| Path | Put this on it | Serves |
 |---|---|---|
-| `/sign_in` | Sign in | `<sa-sign-in>` — also handles password reset and set |
-| `/sign_in/password/reset` | Forgot password form | |
-| `/sign_in/password/set/<token>` | Set new password | |
-| `/sign_in/confirm/<token>` | Email confirmation | Handled by `<sa-sign-in>` confirm outlet |
-| `/register` | Create account | `<sa-register>` |
-| `/sites` | Site list + detail | `<sa-sites>` |
-| `/sites/<id>` | Site detail deep link | |
-| `/sites/local` | Local site | |
-| `/sites/activate` | Site activation | |
-| `/sites/register` | Register a device | |
-| `/user` | Account page | `<sa-user>` |
-| `/terms` | Terms and conditions | Linked from `<sa-register>` |
+| `/sign_in` | `<sa-sign-in organization-id="…" return-to="/sites">` | signing in, forgot password, setting a password from an emailed link, confirming an email address |
+| `/register` | `<sa-register organization-id="…" sign-in="/sign_in">` | creating an account |
+| `/sites` | `<sa-sites sign-in="/sign_in" organization="…">` | the site list, a site's detail, and inviting someone to a site |
+| `/user` | `<sa-user sign-in="/sign_in">` | account details and signing out |
+| `/terms` | your own terms — no element | linked from the register form |
+
+**There is nothing else to create.** Everything beyond those pages is a fragment
+handled by the element already on the page, which is why the list is this short
+— it is four files in WordPress, Joomla, or anything else, not a page per
+feature:
+
+```
+/sign_in#password/request_reset      /sites#<id>
+/sign_in#password/reset/<token>      /sites#<id>/invite
+/sign_in#password/set/<token>        /sites#register?uid=<uid>
+/sign_in#confirm/<token>             /sites#<id>/reset_password
+                                     /sites#local
+                                     /sites#activate?uid=<uid>
+```
+
+Those are the URLs our emails and deep links actually use. **If you have seen
+`/sign_in/password/reset` or `/sites/<id>` written as paths, they are not** —
+earlier versions of this table listed them that way and they never worked,
+because both elements route on the fragment and neither has ever read the path.
 
 ## Swapping an outlet
 

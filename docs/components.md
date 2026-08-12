@@ -68,8 +68,9 @@ Turnstile) configured by SolarAssistant. If no challenge is configured on your
 organization, the iframe stays blank and registration proceeds without a token.
 
 **Confirmation email.** After registration the API sends a confirmation email with
-a link to `/sign_in/confirm/<token>`. Your sign-in page (with `<sa-sign-in>`)
-handles this automatically — no separate confirmation page is needed.
+a link to `/sign_in#confirm/<token>`. Your sign-in page (with `<sa-sign-in>`)
+handles this automatically — the token is in the fragment, so no separate
+confirmation page is needed.
 
 
 ## `<sa-sign-in>`
