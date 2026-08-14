@@ -186,7 +186,7 @@ class SaRegister extends HTMLElement {
       <div class="card-section">
         <div class="notice">
           <p>${t('account_created', { email: `<strong>${escapeHtml(email)}</strong>` })}</p>
-          <p>${t('check_inbox', { link: `<a href="${signIn}">sign in</a>` })}</p>
+          <p>${t('check_inbox', { link: `<a href="${signIn}">${t('sign_in')}</a>` })}</p>
         </div>
       </div>
     `

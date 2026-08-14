@@ -1,4 +1,26 @@
+import af from './locales/af.js'
+import bg from './locales/bg.js'
+import cs from './locales/cs.js'
+import da from './locales/da.js'
+import de from './locales/de.js'
+import el from './locales/el.js'
+import es from './locales/es.js'
+import fr from './locales/fr.js'
+import hu from './locales/hu.js'
+import it from './locales/it.js'
+import lt from './locales/lt.js'
+import nl from './locales/nl.js'
+import pl from './locales/pl.js'
+import pt from './locales/pt.js'
+import ro from './locales/ro.js'
+import uk from './locales/uk.js'
+import vi from './locales/vi.js'
+import zh_CN from './locales/zh_CN.js'
+import zh_TW from './locales/zh_TW.js'
+
 const MESSAGES = {
+  // English is the source and the fallback, so it stays here where the keys are
+  // defined. Every other locale is a file under locales/, keyed the same.
   en: {
     // Common
     email: 'Email',
@@ -66,6 +88,7 @@ const MESSAGES = {
     my_account: 'My account',
     sign_out: 'Sign out',
     phone_number: 'Phone number',
+    language: 'Language',
 
     // Sites list
     no_sites: 'You have not registered any solar sites yet.',
@@ -95,7 +118,6 @@ const MESSAGES = {
     activation_no_unit: 'We could not find that system. Open this page from the link on your device.',
     activation_request_failed: 'The request could not be sent.',
     activation_too_many: 'Too many attempts. Please wait a while and try again.',
-    reset_password: 'Reset password',
     copy_to_clipboard: 'Copy to clipboard',
     copied: 'Copied',
     site_reset_password_instruction: 'Copy the token below and paste it back into your device to reset its password.',
@@ -121,36 +143,85 @@ const MESSAGES = {
     register_site: 'Register site',
     failed_register: 'Failed to register site.',
   },
+  af, bg, cs, da, de, el, es, fr, hu, it, lt, nl, pl, pt, ro, uk, vi, zh_CN, zh_TW,
 }
 
 let _locale = 'en'
 
+function match(tag) {
+  const code = tag.replace('-', '_')
+  if (MESSAGES[code]) return code
+  const base = tag.split('-')[0]
+  return MESSAGES[base] ? base : null
+}
+
+// The page's own language outranks the browser's, because the components sit
+// inside someone else's markup. A portal written in English stays English for a
+// visitor browsing in German — translating the buttons and nothing around them
+// reads as a bug, not a feature. What the browser prefers only decides pages that
+// declare no language of their own.
 function detect() {
   try {
     const stored = localStorage.getItem('sa_locale')
     if (stored && MESSAGES[stored]) return stored
   } catch {}
-  for (const lang of navigator.languages ?? []) {
-    const code = lang.replace('-', '_')
-    if (MESSAGES[code]) return code
-    const base = lang.split('-')[0]
-    if (MESSAGES[base]) return base
+  const declared = document.documentElement.lang
+  if (declared) return match(declared) ?? 'en'
+  for (const tag of navigator.languages ?? []) {
+    const code = match(tag)
+    if (code) return code
   }
   return 'en'
 }
 
 _locale = detect()
-if (document.documentElement.lang !== _locale) document.documentElement.lang = _locale
+// Only claim the document's language where the page has not stated one; saying
+// `de` over someone's English page would misdescribe their prose to a screen
+// reader, which is the one thing this attribute exists to get right.
+if (!document.documentElement.lang) document.documentElement.lang = _locale
 
 export function setLocale(code) {
   if (!code || code === _locale) return
+  // A code with no messages behind it is a mistake on the caller's side, and
+  // falling back silently leaves them nothing to see it by.
+  if (!MESSAGES[code]) {
+    console.warn(
+      `[solar-assistant] No messages for locale "${code}". Using English. ` +
+        `Register them with addMessages('${code}', { … }).`,
+    )
+  }
   _locale = MESSAGES[code] ? code : 'en'
-  document.documentElement.lang = _locale
+  if (!document.documentElement.lang) document.documentElement.lang = _locale
   try { localStorage.setItem('sa_locale', _locale) } catch {}
 }
 
 export function addMessages(code, messages) {
   MESSAGES[code] = { ...MESSAGES[code], ...messages }
+}
+
+export function currentLocale() {
+  return _locale
+}
+
+// Whatever is registered, so a locale added with addMessages appears in a
+// language switcher without the page having to list it a second time.
+export function locales() {
+  return Object.keys(MESSAGES)
+}
+
+// `Intl.DisplayNames` names a language in its own tongue, including one we have
+// never heard of. It calls zh_CN "中文（中国）", naming the region; the script is
+// what actually distinguishes these two to a reader, so say that instead.
+const ENDONYMS = { zh_CN: '简体中文', zh_TW: '繁體中文' }
+
+export function localeName(code) {
+  if (ENDONYMS[code]) return ENDONYMS[code]
+  const tag = code.replace('_', '-')
+  try {
+    return new Intl.DisplayNames([tag], { type: 'language' }).of(tag) ?? code
+  } catch {
+    return code
+  }
 }
 
 export function t(key, vars) {

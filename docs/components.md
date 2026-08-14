@@ -122,8 +122,13 @@ Each view inside `<sa-sites>` is swappable with your own component. See
 
 ## `<sa-user>`
 
-Shows the signed-in user's account details (name, email, phone) and a sign-out
-button.
+Shows the signed-in user's account details (name, email, phone), a language
+picker, and a sign-out button.
+
+The picker lists every registered locale, each named in its own language, and
+saves the choice to the user's SolarAssistant account so it follows them to their
+next browser and to the rest of SolarAssistant. Changing it reloads the page — see
+[Locale and translations](i18n.md#the-built-in-picker).
 
 ```html
 <sa-user sign-in="/sign_in"></sa-user>
