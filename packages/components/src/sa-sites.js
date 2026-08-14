@@ -95,7 +95,6 @@ class SaSites extends HTMLElement {
       const el = document.createElement(tag)
       el.api = this._api
       el.currentUser = this._currentUser
-      el.organization = this.getAttribute('organization') || ''
       el.setAttribute('sign-in', this._signIn)
       el.classList.toggle('embedded', this.classList.contains('embedded'))
       this.appendChild(el)

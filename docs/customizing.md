@@ -51,7 +51,7 @@ domain and carry the element shown.
 |---|---|---|
 | `/sign_in` | `<sa-sign-in organization-id="…" return-to="/sites">` | signing in, forgot password, setting a password from an emailed link, confirming an email address |
 | `/register` | `<sa-register organization-id="…" sign-in="/sign_in">` | creating an account |
-| `/sites` | `<sa-sites sign-in="/sign_in" organization="…">` | the site list, a site's detail, and inviting someone to a site |
+| `/sites` | `<sa-sites sign-in="/sign_in">` | the site list, a site's detail, and inviting someone to a site |
 | `/user` | `<sa-user sign-in="/sign_in">` | account details and signing out |
 | `/terms` | your own terms — no element | linked from the register form |
 
