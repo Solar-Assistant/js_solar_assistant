@@ -1,6 +1,7 @@
 // Shared styles + helpers for the <sa-sites> family (router + outlet components).
 import { apiClient, readToken, clearSession } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
+import { escapeHtml } from './escape.js'
 
 export const sitesStyles = `
   :host { display: block; font-family: inherit; }
@@ -87,7 +88,9 @@ export const sitesStyles = `
 
 export function field(label, value) {
   if (!value && value !== 0) return ''
-  return `<div class="form-field"><label>${label}</label><div class="form-value">${value}</div></div>`
+  // The label is ours (a translated string, which may carry deliberate markup);
+  // the value came from the API and never is.
+  return `<div class="form-field"><label>${label}</label><div class="form-value">${escapeHtml(value)}</div></div>`
 }
 
 // Display name for a site — mirrors SACloud.Site.caption/1.

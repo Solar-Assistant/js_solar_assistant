@@ -1,12 +1,9 @@
 import { BASE } from '@solar-assistant/api'
 import { signInStyles } from './sa-sign-in-form.js'
 import { t } from './i18n.js'
+import { escapeHtml } from './escape.js'
 
 const ORIGIN = new URL(BASE).origin
-
-function escapeHtml(s) {
-  return s.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]))
-}
 
 // Default "forgot password" outlet for <sa-sign-in>. Posts the reset request
 // and shows a confirmation. Navigates to # (empty) on back.

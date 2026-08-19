@@ -1,10 +1,7 @@
 import { BASE } from '@solar-assistant/api'
 import { signInStyles } from './sa-sign-in-form.js'
 import { t } from './i18n.js'
-
-function escapeHtml(s) {
-  return String(s).replace(/[<>&"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]))
-}
+import { escapeHtml } from './escape.js'
 
 // Default email-confirmation outlet for <sa-sign-in>. Reads `token` attribute
 // set by the router, calls POST /api/v1/user/confirm, and shows result.

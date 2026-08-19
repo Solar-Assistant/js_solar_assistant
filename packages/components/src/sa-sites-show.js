@@ -1,6 +1,7 @@
 import { siteUrl, normalizeRole } from '@solar-assistant/api'
 import { sitesStyles, field, caption, registered, formatDate, resolveApi, redirectToSignIn } from './sites-shared.js'
 import { t } from './i18n.js'
+import { escapeHtml } from './escape.js'
 
 // Default detail outlet for <sa-sites>. Reads the `site-id` route param (the
 // router updates it on navigation, like useParams), loads /sites/:id, and shows
@@ -53,8 +54,8 @@ class SaSitesShow extends HTMLElement {
 
       view.innerHTML = `
         <div class="row">
-          <h1 class="title"><span class="breadcrumb hide-android"><a class="back">${t('sites')}</a> › </span>${name}</h1>
-          ${siteUrl(site) ? `<a class="btn hide-android" href="${siteUrl(site)}" target="_blank">${t('connect')}</a>` : ''}
+          <h1 class="title"><span class="breadcrumb hide-android"><a class="back">${t('sites')}</a> › </span>${escapeHtml(name)}</h1>
+          ${siteUrl(site) ? `<a class="btn hide-android" href="${escapeHtml(siteUrl(site))}" target="_blank">${t('connect')}</a>` : ''}
         </div>
 
         <div class="card"><div class="card-section">
@@ -78,12 +79,12 @@ class SaSitesShow extends HTMLElement {
                 <tbody>
                   ${users.map(u => ({ ...u, role: normalizeRole(u.role) })).map(u => `
                     <tr data-user-id="${u.id}">
-                      <td>${[u.first_name, u.last_name].filter(Boolean).join(' ') || '—'}</td>
-                      <td>${u.email}</td>
+                      <td>${escapeHtml([u.first_name, u.last_name].filter(Boolean).join(' ')) || '—'}</td>
+                      <td>${escapeHtml(u.email)}</td>
                       <td>
                         ${u.role === 'owner'
                           ? `<select class="role-select" disabled><option selected>${t('role_owner')}</option></select>`
-                          : `<select class="role-select" data-user-id="${u.id}" data-original="${u.role}">
+                          : `<select class="role-select" data-user-id="${u.id}" data-original="${escapeHtml(u.role)}">
                                <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>${t('role_viewer')}</option>
                                <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>${t('role_admin')}</option>
                                <option value="none">${t('role_none')}</option>

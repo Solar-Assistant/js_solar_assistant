@@ -2,6 +2,7 @@ import { inviteRoles } from '@solar-assistant/api'
 import { sitesStyles, caption, resolveApi, redirectToSignIn } from './sites-shared.js'
 import { showErrors } from './form-utils.js'
 import { t } from './i18n.js'
+import { escapeHtml } from './escape.js'
 
 // Default invite outlet for <sa-sites>. Reads the `site-id` param, loads the site
 // (for its name and to decide which roles can be granted), and posts an invite.
@@ -38,7 +39,7 @@ class SaSitesInvite extends HTMLElement {
       <h1 class="title">
         <span class="breadcrumb">
           <span class="hide-android"><a class="back-list">${t('sites')}</a> › </span>
-          <a class="back-site">${name}</a> › ${t('invite_user')}
+          <a class="back-site">${escapeHtml(name)}</a> › ${t('invite_user')}
         </span>
       </h1>
       <div class="card">

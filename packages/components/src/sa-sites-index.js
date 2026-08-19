@@ -1,6 +1,7 @@
 import { sitesStyles, caption, resolveApi, redirectToSignIn } from './sites-shared.js'
 import { accentBlockStyles } from './styles.js'
 import { t } from './i18n.js'
+import { escapeHtml } from './escape.js'
 
 const template = `<style>${sitesStyles}${accentBlockStyles}</style><div class="list"></div>`
 
@@ -56,10 +57,10 @@ class SaSitesIndex extends HTMLElement {
               return `
                 <tr>
                   <td>
-                    <div class="site-caption">${caption(site)}</div>
-                    ${site.description ? `<div class="site-hardware">${site.description}</div>` : ''}
+                    <div class="site-caption">${escapeHtml(caption(site))}</div>
+                    ${site.description ? `<div class="site-hardware">${escapeHtml(site.description)}</div>` : ''}
                   </td>
-                  <td class="site-owner">${ownerName}</td>
+                  <td class="site-owner">${escapeHtml(ownerName)}</td>
                   <td class="buttons"><button class="btn" data-id="${site.id}">${t('view')}</button></td>
                 </tr>
               `
