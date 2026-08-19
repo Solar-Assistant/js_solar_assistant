@@ -57,8 +57,7 @@ domain and carry the element shown.
 
 **There is nothing else to create.** Everything beyond those pages is a fragment
 handled by the element already on the page, which is why the list is this short
-— it is four files in WordPress, Joomla, or anything else, not a page per
-feature:
+— four files, not a page per feature:
 
 ```
 /sign_in#password/request_reset      /sites#<id>

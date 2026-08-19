@@ -66,7 +66,7 @@ Two things to know:
 ## What this does not cover
 
 Integrity protects the delivery of our file to your page. It does nothing about
-anything else running on the same page: a script your CMS injects, a plugin, an
-ad tag, or an XSS hole in your own site can read whatever your page can read,
-including a signed-in customer's session. Pinning is worth doing and is not a
+anything else running on the same page: an analytics tag, a chat widget, or an
+XSS hole in your own code can read whatever your page can read, including a
+signed-in customer's session. Pinning is worth doing and is not a
 substitute for the rest of the page being trustworthy.

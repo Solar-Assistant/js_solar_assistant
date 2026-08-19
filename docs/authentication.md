@@ -51,11 +51,11 @@ to your sign-in page. `<sa-sites>` and `<sa-user>` do this automatically via the
 
 ## Auth transfer - from mobile or external app
 
-If a user is already signed into your app and you provide a link to your website,
+If a user is already signed into your app and you provide a link to your portal,
 that link should open authenticated. Asking them to sign in again is a poor
 experience. Auth transfer solves this: your app mints a short-lived, single-use
 `session_token` and passes it to the sign-in page, which exchanges it for a real
-session. The user lands on your website already signed in.
+session. The user lands on your portal already signed in.
 
 ### Step 1 — mint a transfer token (from your mobile or external app)
 

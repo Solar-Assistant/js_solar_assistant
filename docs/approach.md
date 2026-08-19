@@ -3,8 +3,8 @@
 Many solar businesses treat their website as a brochure: a WordPress or Joomla
 template, stock images, a contact form. Not a place where customers actually
 interact with the business. In this document we explain why we think that is worth
-changing, and why we put in the effort to make integrating SolarAssistant with
-your website as easy as possible.
+changing, and why we put in the effort to make a portal of your own as easy as
+possible to have.
 
 ## The customer relationship starts before monitoring
 
@@ -14,7 +14,7 @@ the time monitoring is relevant, you already have a relationship with that custo
 and data about them.
 
 Solar monitoring is the most visited touchpoint your customer has with your brand,
-but it reflects only part of the relationship. Your website is a great
+but it reflects only part of the relationship. Your own portal is a great
 place for a holistic view of it.
 
 ## A simple login today, a foundation for tomorrow
@@ -35,10 +35,10 @@ monitoring app.
 
 ## AI is here
 
-With tools like Claude or ChatGPT, integrating SolarAssistant into your website comes down to a few prompts.
-Describe what you want, point it at this repository and your site, and it handles
-the implementation. What used to require a developer and days of work is now
-accessible to any business willing to spend an afternoon on it.
+With tools like Claude or ChatGPT, making the portal your own comes down to a few prompts. Start from
+a template, point the tool at it and at this repository, describe what you want, and it handles the
+implementation. What used to require a developer and days of work is now accessible to any business
+willing to spend an afternoon on it.
 
 ## What this means in practice
 
