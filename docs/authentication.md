@@ -16,6 +16,31 @@ POST https://solar-assistant.io/api/v1/sign_in   { email, password, organization
 call this endpoint yourself and store the token. The `user.locale` field is used to
 apply the right language automatically — see [Locale and translations](i18n.md).
 
+## Unconfirmed accounts
+
+Signing in with an account whose email address has not been confirmed returns
+`412` rather than a session, along with a `pending_token`. The API re-sends the
+confirmation email at the same time.
+
+```
+POST /sign_in   { email, password, organization_id }
+  ->  412  { error, next_step: "click_email_link", pending_token }
+```
+
+That token is how the sign-in finishes without asking for the password again.
+Once the user clicks the link in their email, exchange it for a session:
+
+```
+POST /sign_in   { email, pending_token, organization_id }
+  ->  412  while the address is still unconfirmed (the same pending_token comes back)
+  ->  200  { token, expires_at, user }  once confirmed; the pending token is then spent
+  ->  401  once the pending token has expired, ten minutes after it was issued
+```
+
+`<sa-sign-in>` polls this for you and signs the user in as soon as they click,
+so they can leave the tab open and come back to it. If you are using the API
+client directly, poll it yourself and stop on the `401`.
+
 When a request returns `401`, the token has expired. Clear it and redirect the user
 to your sign-in page. `<sa-sites>` and `<sa-user>` do this automatically via their
 `sign-in` attribute.

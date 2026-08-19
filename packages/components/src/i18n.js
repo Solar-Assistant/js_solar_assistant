@@ -41,7 +41,8 @@ const MESSAGES = {
     // Sign-in form
     keep_signed_in: 'Keep me signed in',
     forgot_password: 'Forgot password?',
-    pending_confirmation: 'Account pending confirmation. Please check your email.',
+    pending_confirmation: 'Account pending confirmation. Please check your email — this page will continue once you have clicked the link.',
+    pending_expired: 'That confirmation link request has expired. Please sign in again.',
     invalid_credentials: 'Invalid email or password.',
 
     // Opening a site (to_site). One message covers both "no such site" and "not
