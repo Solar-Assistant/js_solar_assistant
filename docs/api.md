@@ -112,12 +112,18 @@ These manage the token in browser storage under a key you choose (e.g.
 ### `persistSession(storage, key, token, expiresAt)`
 
 Writes `token` and `expiresAt` to the given `Storage` (`localStorage` or
-`sessionStorage`).
+`sessionStorage`). The expiry is normalised to an ISO timestamp on the way in, so
+a stored session always carries one the helpers below can read back. Pass the
+`expires_at` from the sign-in response; if it is missing or unreadable a short
+fallback is stored instead, because a session with no known end is one you cannot
+tell has finished.
 
 ### `sessionValid(storage, key)`
 
-Returns `true` if `storage` holds a token whose expiry is still in the future. If
-no parseable expiry was stored, it falls back to "token present".
+Returns `true` if `storage` holds a token whose expiry is still in the future, and
+`false` otherwise — including when there is no readable expiry at all. Treat it as
+a shortcut that saves a doomed request, not as authority: the token is checked by
+the API on every call, and the browser's clock is not ours.
 
 ### `readToken(key)`
 
@@ -125,6 +131,9 @@ Returns a valid token from `sessionStorage` or `localStorage` (sessionStorage
 first), or `null` if neither holds a live session. Use this for the "am I signed
 in?" check when you offer a "keep me signed in" option, since the token may live
 in either storage.
+
+A session that has lapsed is removed from storage as it is found, so a token does
+not outlive its session waiting for something to provoke a `401`.
 
 ### `clearSession(key)`
 

@@ -55,29 +55,53 @@ export function normalizeRole(role) {
   return role === 'member' ? 'viewer' : role
 }
 
+// How long a session is assumed to last when the API returns no expiry we can
+// read. Short, because the point is to bound a session we know nothing about —
+// every current build returns expires_at, so this should never be reached.
+const FALLBACK_SESSION_MS = 24 * 60 * 60 * 1000
+
+// Milliseconds since the epoch, or null if there is nothing usable to read.
+// Absent, empty and unparseable all have to come out the same, because all
+// three mean the same thing: we cannot tell when this session ends.
+function expiryOf(expiresAt) {
+  const at = expiresAt ? new Date(expiresAt).getTime() : NaN
+  return Number.isNaN(at) ? null : at
+}
+
+// The expiry is normalised on the way in, so a session in storage always carries
+// one this can read back. An unreadable expiry is therefore not "an old API" but
+// a session written by something else, and is treated as over.
 export function persistSession(storage, key, token, expiresAt) {
+  const expiry = expiryOf(expiresAt) ?? Date.now() + FALLBACK_SESSION_MS
   storage.setItem(key, token)
-  storage.setItem(`${key}_expires_at`, expiresAt)
+  storage.setItem(`${key}_expires_at`, new Date(expiry).toISOString())
 }
 
 export function sessionValid(storage, key) {
-  const token = storage.getItem(key)
-  if (!token) return false
-  // Enforce expiry when the API gave us one we can parse; otherwise fall back to
-  // token presence (older API builds don't return expires_at).
-  const expiresAt = storage.getItem(`${key}_expires_at`)
-  const expiry = expiresAt ? new Date(expiresAt).getTime() : NaN
-  if (Number.isNaN(expiry)) return true
+  if (!storage.getItem(key)) return false
+  const expiry = expiryOf(storage.getItem(`${key}_expires_at`))
+  if (expiry === null) return false
   return Date.now() < expiry
 }
 
 // Returns a valid token from sessionStorage or localStorage, or null if neither
 // holds a live session. sessionStorage is checked first so a per-session sign-in
 // ("keep me signed in" unchecked) takes precedence over a stale persisted one.
+//
+// A lapsed session is dropped as it is found. Nothing else does this: clearSession
+// runs on sign-out and on a 401, so a token belonging to someone who signed in
+// once and never came back would otherwise sit in localStorage indefinitely.
 export function readToken(key) {
-  if (sessionValid(sessionStorage, key)) return sessionStorage.getItem(key)
-  if (sessionValid(localStorage, key)) return localStorage.getItem(key)
-  return null
+  let token = null
+  for (const storage of [sessionStorage, localStorage]) {
+    if (sessionValid(storage, key)) {
+      token ??= storage.getItem(key)
+    } else {
+      storage.removeItem(key)
+      storage.removeItem(`${key}_expires_at`)
+    }
+  }
+  return token
 }
 
 // Removes the token and its expiry from both storages.
