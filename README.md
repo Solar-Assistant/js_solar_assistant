@@ -30,7 +30,7 @@ Configure the **Cloud host** on your SolarAssistant organization to your domain.
 | **Customization** | CSS only: colors, borders, and corner radius via CSS variables. | Unlimited. You own the markup and styles. |
 | **Guide** | [Components guide →](docs/components.md) | [API reference →](docs/api.md) |
 
-Further reading: [Integrating with your platform](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
+Further reading: [Integrating with your platform](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [Versions and pinning](docs/versions.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
 
 Both are framework-agnostic and ship from this repository. Pick per page, or mix them.
 
@@ -50,6 +50,10 @@ The components load straight from the CDN, so there's no build step:
 ```html
 <script type="module" src="https://cdn.solar-assistant.io/js/solar-assistant.js"></script>
 ```
+
+That URL always serves the newest release. For a site you are leaving running,
+point at a major version — `…/js/v1/solar-assistant.js` — or pin an exact one.
+See [Versions and pinning](docs/versions.md).
 
 ## Development
 
@@ -72,3 +76,7 @@ Two files are published to `cdn.solar-assistant.io/js/`:
 
 - `solar-assistant.js` — ES module, components + API client, built from `packages/components/src/index.js`
 - `solar-assistant-api.js` — IIFE, API client only, exposes `window.SolarAssistant`
+
+Each release writes both files to three prefixes — `js/<version>/`, `js/v<major>/`
+and `js/` — from a single build. [Versions and pinning](docs/versions.md) covers
+what an integrator does with that.

@@ -19,6 +19,10 @@ In WordPress, add this to your theme header (via your theme's `functions.php` or
 a header plugin). In Joomla, add it through a Custom HTML module assigned to the
 header position. Nothing to build or host yourself.
 
+That URL serves the newest release. To decide for yourself when your page's copy
+of it changes, use a version-specific URL instead — see
+[Versions and pinning](versions.md).
+
 ### 2. Add the tags
 
 Give each page one of the components. In WordPress, paste the tag into a Custom

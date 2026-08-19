@@ -23,6 +23,9 @@ So on most platforms the whole integration is:
 <sa-sign-in organization-id="YOUR_ORG_ID" return-to="/sites"></sa-sign-in>
 ```
 
+That script URL serves the newest release. Which URL you embed is a decision in
+itself — see [Choosing which URL to embed](#choosing-which-url-to-embed) below.
+
 ## Three things that break it
 
 Worth knowing before you pick a platform, because each fails in a way that does not look like its
@@ -48,6 +51,22 @@ will ask them to sign in again. If a platform's "embed HTML" produces an iframe,
 editors sanitize unknown attributes off unknown elements. If it is removed, sign-in points at
 nothing while the page still renders perfectly. If sign-in fails in a way you cannot explain, view
 source and confirm the attribute survived with the right value.
+
+## Choosing which URL to embed
+
+The plain `…/js/solar-assistant.js` URL changes whenever we release. On a site
+you are actively running, `…/js/v1/solar-assistant.js` is the better default:
+fixes still reach you, a breaking change does not. If your organization reviews
+what its pages load, pin an exact version and add an integrity hash. [Versions
+and pinning](versions.md) has both forms.
+
+One interaction specific to this document: an **optimisation plugin that
+combines or minifies scripts will break an integrity hash**, because the hash
+describes our file and the browser is then handed a different one. That is the
+plugin doing what it was installed to do. Either exclude the script from
+optimisation — most such plugins have a list for this — or do not pin on that
+site. A page that silently stops rendering sign-in after a plugin update is the
+failure mode to expect if you do neither.
 
 ## Platform notes
 
