@@ -15,7 +15,7 @@ import './sa-sites-register.js'
 //   #<id>              show        site-id
 //   #<id>/invite       invite      site-id
 //   #<id>/reset_password  resetPassword  site-id
-//   #local             local       —
+//   #local?uid=…       local       uid
 //   #activate?uid=…    activate    uid
 //   #register?uid=…    register    uid
 const ROUTES = [
@@ -24,7 +24,8 @@ const ROUTES = [
   { test: h => /^\d+\/invite$/.test(h), outlet: 'invite',   param: 'site-id', value: h => h.split('/')[0] },
   { test: h => /^\d+\/reset_password$/.test(h), outlet: 'resetPassword', param: 'site-id',
     value: h => h.split('/')[0] },
-  { test: h => h === 'local',           outlet: 'local' },
+  { test: h => /^local(\?|$)/.test(h),   outlet: 'local',    param: 'uid',
+    value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
   { test: h => /^activate(\?|$)/.test(h), outlet: 'activate', param: 'uid',
     value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
   { test: h => /^register(\?|$)/.test(h), outlet: 'register', param: 'uid',

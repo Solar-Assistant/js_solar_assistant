@@ -85,8 +85,9 @@ class SaSitesLocal extends HTMLElement {
   }
 
   async _load() {
-    // Units on the network you are browsing from, not your own sites.
-    const uid = new URLSearchParams(location.search).get('uid')
+    // Units on the network you are browsing from, not your own sites. The router
+    // passes uid from the hash; location.search is for a standalone page mount.
+    const uid = this.getAttribute('uid') || new URLSearchParams(location.search).get('uid')
     let res
     try {
       res = await this._api.get('/sites/local', uid ? { uid } : undefined)
