@@ -4,7 +4,8 @@ import { showErrors } from './form-utils.js'
 import { t } from './i18n.js'
 
 // Default set/reset-password outlet for <sa-sign-in>. Receives `token` and
-// `mode` ('set' | 'reset') attributes updated by the router on each navigation.
+// `mode` ('set' | 'reset') attributes updated by the router on each navigation,
+// and `site-id` when the invite mail named one.
 class SaSignInSetPassword extends HTMLElement {
   static get observedAttributes() { return ['token', 'mode'] }
 
@@ -70,7 +71,10 @@ class SaSignInSetPassword extends HTMLElement {
       if (res.ok) {
         const { token: apiToken, expires_at } = await res.json()
         persistSession(localStorage, 'sa_token', apiToken, expires_at)
-        window.location.href = this.getAttribute('return-to') || '/sites'
+        const siteId = this.getAttribute('site-id')
+        window.location.href = siteId
+          ? `/sites#${encodeURIComponent(siteId)}`
+          : (this.getAttribute('return-to') || '/sites')
         return
       }
 

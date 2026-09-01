@@ -139,10 +139,13 @@ class SaSignIn extends HTMLElement {
       this._show(this._tags.reset)
       return
     }
-    if ((m = hash.match(/^password\/(reset|set)\/(.+)$/))) {
+    // The invite mail appends ?site_id=, so the token stops at the query.
+    if ((m = hash.match(/^password\/(reset|set)\/([^?]+)/))) {
       const el = this._show(this._tags.setPassword)
       el.setAttribute('mode', m[1])
       el.setAttribute('token', m[2])
+      const siteId = new URLSearchParams(hash.split('?')[1] || '').get('site_id')
+      if (siteId) el.setAttribute('site-id', siteId); else el.removeAttribute('site-id')
       return
     }
     if ((m = hash.match(/^confirm\/(.+)$/))) {
