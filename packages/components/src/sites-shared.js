@@ -121,6 +121,15 @@ export function resolveApi(el) {
   return apiClient(token)
 }
 
+// The device learns its own host from this token, so a link that came from one
+// gets followed back. Returns false when there is nothing to follow.
+export function followDeviceCallback(el, token) {
+  const callback = el.getAttribute('callback')
+  if (!callback || !token) return false
+  window.location.href = `${callback}?token=${encodeURIComponent(token)}`
+  return true
+}
+
 // Clears the session and sends the user to the sign-in page (used on a 401).
 export function redirectToSignIn(el) {
   clearSession('sa_token')

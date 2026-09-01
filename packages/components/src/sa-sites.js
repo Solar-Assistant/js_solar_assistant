@@ -10,26 +10,26 @@ import './sa-sites-register.js'
 // <sa-sites index="acme-fleet"> swaps just the list. Outlets talk back by setting
 // location.hash, so a custom outlet needs no wiring beyond that.
 //
-//   route              outlet      param
-//   (empty)            index       —
-//   #<id>              show        site-id
-//   #<id>/invite       invite      site-id
-//   #<id>/reset_password  resetPassword  site-id
-//   #local?uid=…       local       uid
-//   #activate?uid=…    activate    uid
-//   #register?uid=…    register    uid
+// A route takes its param from the path (`param`/`value`) or names the query keys
+// it wants lifted out of the fragment onto the outlet (`query`).
+//
+//   route                        outlet         param / query
+//   (empty)                      index          —
+//   #<id>                        show           site-id
+//   #<id>/invite                 invite         site-id
+//   #<id>/reset_password         resetPassword  site-id
+//   #local?uid=…                 local          uid
+//   #activate?uid=…&callback=…   activate       uid, callback
+//   #register?uid=…&callback=…   register       uid, callback
 const ROUTES = [
   { test: h => h === '',                outlet: 'index' },
   { test: h => /^\d+$/.test(h),         outlet: 'show',     param: 'site-id', value: h => h },
   { test: h => /^\d+\/invite$/.test(h), outlet: 'invite',   param: 'site-id', value: h => h.split('/')[0] },
   { test: h => /^\d+\/reset_password$/.test(h), outlet: 'resetPassword', param: 'site-id',
     value: h => h.split('/')[0] },
-  { test: h => /^local(\?|$)/.test(h),   outlet: 'local',    param: 'uid',
-    value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
-  { test: h => /^activate(\?|$)/.test(h), outlet: 'activate', param: 'uid',
-    value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
-  { test: h => /^register(\?|$)/.test(h), outlet: 'register', param: 'uid',
-    value: () => new URLSearchParams((location.hash.split('?')[1] || '')).get('uid') || '' },
+  { test: h => /^local(\?|$)/.test(h),    outlet: 'local',    query: ['uid'] },
+  { test: h => /^activate(\?|$)/.test(h), outlet: 'activate', query: ['uid', 'callback'] },
+  { test: h => /^register(\?|$)/.test(h), outlet: 'register', query: ['uid', 'callback'] },
 ]
 
 class SaSites extends HTMLElement {
@@ -88,6 +88,12 @@ class SaSites extends HTMLElement {
     if (!r) return
     const el = this._mount(this._tags[r.outlet])
     if (r.param) el.setAttribute(r.param, r.value(hash))
+    // Outlets stay mounted across navigations, so an absent key must be cleared.
+    const query = new URLSearchParams(hash.split('?')[1] || '')
+    for (const key of r.query || []) {
+      const value = query.get(key)
+      if (value) el.setAttribute(key, value); else el.removeAttribute(key)
+    }
     for (const m of Object.values(this._mounted)) m.hidden = m !== el
   }
 

@@ -1,9 +1,10 @@
-import { sitesStyles, resolveApi, redirectToSignIn } from './sites-shared.js'
+import { sitesStyles, resolveApi, redirectToSignIn, followDeviceCallback } from './sites-shared.js'
 import { showErrors } from './form-utils.js'
 import { t } from './i18n.js'
 
-// Default device-registration outlet for <sa-sites>. Reads the `uid` param
-// (the device to claim) and posts /sites/register, then opens the new site.
+// Default device-registration outlet for <sa-sites>. Reads the `uid` param (the
+// device to claim) and posts /sites/register, then hands the device its token so
+// it learns its own host, or opens the new site when there is no token to pass.
 class SaSitesRegister extends HTMLElement {
   static get observedAttributes() { return ['uid'] }
 
@@ -60,6 +61,7 @@ class SaSitesRegister extends HTMLElement {
 
     if (res.ok) {
       const site = await res.json()
+      if (followDeviceCallback(this, site.token)) return
       location.hash = site.id
     } else {
       const body = await res.json()
@@ -72,6 +74,7 @@ class SaSitesRegister extends HTMLElement {
       }
     }
   }
+
 }
 
 customElements.define('sa-sites-register', SaSitesRegister)

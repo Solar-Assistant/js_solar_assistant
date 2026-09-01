@@ -1,10 +1,11 @@
-import { sitesStyles, resolveApi, redirectToSignIn } from './sites-shared.js'
+import { sitesStyles, resolveApi, redirectToSignIn, followDeviceCallback } from './sites-shared.js'
 import { t } from './i18n.js'
 
 // Read by the installer, not the customer, so it is not translated into theirs.
 const MESSAGE = 'A customer opened this portal with an unactivated system that needs to be activated.'
 
 // Remembered for the tab so a refresh shows the same result instead of asking again.
+// An activated result is never stored: it redirects, and a refresh should mint a fresh token.
 const SENT_KEY = uid => `sa_activation_requested:${uid}`
 
 function makeTemplate() {
@@ -85,8 +86,20 @@ class SaSitesActivate extends HTMLElement {
     }
 
     const result = await res.json()
+    if (result.status === 'activated') return this._activated(result)
+
     try { sessionStorage.setItem(SENT_KEY(uid), JSON.stringify(result)) } catch { /* private mode */ }
     this._done(result)
+  }
+
+  // A perpetual site has no activation to request, so the API hands back the
+  // registration token instead and the device redeems it at its own callback.
+  // This branch returns the usual site json, so `id` — the trial branch below
+  // still answers with site_id.
+  _activated({ token, id }) {
+    if (followDeviceCallback(this, token)) return
+    if (id) location.hash = String(id)
+    else this._fail(t('activation_no_unit'))
   }
 
   // Can arrive either side of our own request finishing, so re-render.
