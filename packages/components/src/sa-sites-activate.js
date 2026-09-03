@@ -48,11 +48,16 @@ class SaSitesActivate extends HTMLElement {
     if (!this._api) return
 
     this.shadowRoot.querySelector('.back-list').addEventListener('click', () => { location.hash = '' })
-    this._request()
+    // The router appends an outlet before it sets the route params, so there may
+    // be nothing to load yet; attributeChangedCallback picks it up. Loading now
+    // would fail and flash an error over the top of the real load.
+    if (this.getAttribute('uid')) this._request()
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'uid' && oldValue !== null && oldValue !== newValue && this._api) this._request()
+    // Not `oldValue !== null`: the router sets the param after appending, so the
+    // first set is the one that matters and skipping it never loads at all.
+    if (name === 'uid' && oldValue !== newValue && this._api) this._request()
   }
 
   _fail(message) {

@@ -12,7 +12,11 @@ authentication, and API wiring stays in place.
   <sa-sites-index>              ← site list          route: # (empty)
   <sa-sites-show>               ← site detail        route: #<id>
   <sa-sites-invite>             ← invite a user      route: #<id>/invite
+  <sa-sites-reset-password>     ← site access token  route: #<id>/reset_password
+  <sa-sites-local>              ← units on this LAN  route: #local?uid=…
+  <sa-sites-activate>           ← ask for activation route: #activate?uid=…
   <sa-sites-register>           ← register a device  route: #register?uid=…
+  <sa-sites-offline>            ← unreachable device route: #offline?host=…
 
 <sa-sign-in>                    ← hash router for the whole auth surface
   <sa-sign-in-form>             ← email/password form         route: # (empty)
@@ -40,6 +44,7 @@ element with your own implementation.
 | `sa-sites-reset-password` | `POST /sites/:id/authorize` | `site-id` | `#` (back) |
 | `sa-sites-local` | `GET /sites/local` | — | — |
 | `sa-sites-activate` | `POST /sites/request_activation` | `uid` | `#<id>` after sending |
+| `sa-sites-offline` | `GET /sites?name=`, `PUT /sites/:id/offline` | `host` | the site's own address when it answers |
 
 ## Required paths
 
@@ -91,6 +96,10 @@ Pass your component's tag name as an attribute to swap it:
 | `show` | `sa-sites-show` | `#<id>` | Site detail |
 | `invite` | `sa-sites-invite` | `#<id>/invite` | Invite users |
 | `register` | `sa-sites-register` | `#register?uid=…` | Register a device |
+| `offline` | `sa-sites-offline` | `#offline?host=…` | A device that cannot be reached |
+| `reset-password` | `sa-sites-reset-password` | `#<id>/reset_password` | A site access token |
+| `local` | `sa-sites-local` | `#local?uid=…` | Units on this network |
+| `activate` | `sa-sites-activate` | `#activate?uid=…` | Ask the installer to activate |
 
 **`<sa-sign-in>` outlets:**
 

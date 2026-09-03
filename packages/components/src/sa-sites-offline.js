@@ -70,7 +70,10 @@ class SaSitesOffline extends HTMLElement {
     this.shadowRoot.innerHTML = makeTemplate()
     this._skeleton()
     this._api = resolveApi(this)
-    if (this._api) this._load()
+    // The router appends an outlet before it sets the route params, so there may
+    // be nothing to load yet; attributeChangedCallback picks it up. Loading now
+    // would fail and flash an error over the top of the real load.
+    if (this._api && this.getAttribute('host')) this._load()
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
