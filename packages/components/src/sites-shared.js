@@ -108,6 +108,17 @@ export function timeField(label, iso) {
     `</div></div>`
 }
 
+// Loading placeholders. A page that draws its own shape straight away and fills
+// it in reads as loading; one that appears a piece at a time reads as broken.
+export function bar(w) {
+  return `<span style="display:inline-block;width:${w}px;height:0.8em;background:#e5e7eb;border-radius:3px;vertical-align:middle"></span>`
+}
+
+export function skeletonField(labelWidth, valueWidth) {
+  return `<div class="form-field"><label>${bar(labelWidth)}</label>` +
+    `<div class="form-value">${bar(valueWidth)}</div></div>`
+}
+
 // A field whose value is a link out. Kept beside field() so the same rule holds:
 // the label is ours, the text and the href came from the API and never are.
 export function linkField(label, text, href) {

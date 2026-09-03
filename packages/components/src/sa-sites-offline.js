@@ -1,4 +1,4 @@
-import { sitesStyles, resolveApi, redirectToSignIn, field, linkField, caption, timeField } from './sites-shared.js'
+import { sitesStyles, resolveApi, redirectToSignIn, field, linkField, caption, timeField, skeletonField } from './sites-shared.js'
 import { escapeHtml } from './escape.js'
 import { t } from './i18n.js'
 
@@ -68,6 +68,7 @@ class SaSitesOffline extends HTMLElement {
   connectedCallback() {
     this.attachShadow({ mode: 'open' })
     this.shadowRoot.innerHTML = makeTemplate()
+    this._skeleton()
     this._api = resolveApi(this)
     if (this._api) this._load()
   }
@@ -79,6 +80,15 @@ class SaSitesOffline extends HTMLElement {
   disconnectedCallback() {
     clearTimeout(this._timer)
     clearInterval(this._ticker)
+  }
+
+  // Drawn before anything is known, so the card has its full shape from the
+  // first frame and fills in, rather than appearing a row at a time.
+  _skeleton() {
+    const facts = this.shadowRoot.getElementById('facts')
+    facts.innerHTML = skeletonField(30, 150) + skeletonField(44, 90) +
+      skeletonField(62, 110) + skeletonField(104, 96)
+    facts.hidden = false
   }
 
   _fail(message) {

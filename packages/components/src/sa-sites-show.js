@@ -1,5 +1,5 @@
 import { siteUrl, normalizeRole } from '@solar-assistant/api'
-import { sitesStyles, field, caption, registered, resolveApi, redirectToSignIn, formatDay, linkField, timeField } from './sites-shared.js'
+import { sitesStyles, field, caption, registered, resolveApi, redirectToSignIn, formatDay, linkField, timeField, bar, skeletonField } from './sites-shared.js'
 import { t } from './i18n.js'
 import { escapeHtml } from './escape.js'
 
@@ -28,8 +28,6 @@ class SaSitesShow extends HTMLElement {
 
   async _load(id) {
     const view = this.shadowRoot.querySelector('.view')
-    const bar = w => `<span style="display:inline-block;width:${w}px;height:0.8em;background:#e5e7eb;border-radius:3px;vertical-align:middle"></span>`
-    const skeletonField = (lw, vw) => `<div class="form-field"><label>${bar(lw)}</label><div class="form-value">${bar(vw)}</div></div>`
     view.innerHTML = `
       <div class="row">
         <h1 class="title"><span class="breadcrumb hide-android"><a class="back">${t('sites')}</a> › </span>${bar(140)}</h1>
