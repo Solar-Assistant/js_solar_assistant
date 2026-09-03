@@ -112,8 +112,9 @@ export function clearSession(key) {
   }
 }
 
+// The address the API reports for a site, or null when it has none yet — an
+// unnamed site has no host to be at. Never assembled here: a partner's sites
+// live on their own domain, which only the server knows.
 export function siteUrl(site) {
-  if (!site.name || !site.proxy) return null
-  const region = site.proxy.split('-')[0]
-  return `https://${site.name}.${region}.solar-assistant.io`
+  return site.url || null
 }

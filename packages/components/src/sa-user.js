@@ -1,5 +1,6 @@
 import { apiClient, readToken, clearSession } from '@solar-assistant/api'
 import { cardStyles } from './styles.js'
+import { returnToHere } from './sites-shared.js'
 import { t, locales, localeName, setLocale, currentLocale } from './i18n.js'
 
 function makeTemplate() {
@@ -83,7 +84,7 @@ class SaUser extends HTMLElement {
     const token = readToken('sa_token')
     if (!token) {
       const signIn = this.getAttribute('sign-in') || '/sign_in'
-      window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
+      window.location.href = `${signIn}?return_to=${encodeURIComponent(returnToHere())}`
       return
     }
 
@@ -123,7 +124,7 @@ class SaUser extends HTMLElement {
     if (res.status === 401) {
       clearSession('sa_token')
       const signIn = this.getAttribute('sign-in') || '/sign_in'
-      window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
+      window.location.href = `${signIn}?return_to=${encodeURIComponent(returnToHere())}`
       return
     }
     const user = await res.json()

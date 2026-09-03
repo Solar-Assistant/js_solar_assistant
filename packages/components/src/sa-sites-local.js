@@ -52,6 +52,7 @@ function makeTemplate() {
     <div class="row head">
       <div class="col col-status">${t('status')}</div>
       <div class="col">${t('network_ip')}</div>
+      <div class="col">${t('url')}</div>
       <div class="col">${t('connected')}</div>
     </div>
     <div id="rows"></div>
@@ -85,9 +86,8 @@ class SaSitesLocal extends HTMLElement {
   }
 
   async _load() {
-    // Units on the network you are browsing from, not your own sites. The router
-    // passes uid from the hash; location.search is for a standalone page mount.
-    const uid = this.getAttribute('uid') || new URLSearchParams(location.search).get('uid')
+    // Units on the network you are browsing from, not your own sites.
+    const uid = this._uid()
     let res
     try {
       res = await this._api.get('/sites/local', uid ? { uid } : undefined)
@@ -99,6 +99,11 @@ class SaSitesLocal extends HTMLElement {
 
     if (res.ok) this._render(await res.json())
     this._timer = setTimeout(() => this._load(), POLL_MS)
+  }
+
+  // The router passes uid from the hash; location.search is for a standalone mount.
+  _uid() {
+    return this.getAttribute('uid') || new URLSearchParams(location.search).get('uid')
   }
 
   _render(sites) {
@@ -115,6 +120,7 @@ class SaSitesLocal extends HTMLElement {
         row.innerHTML = `
           <div class="col col-status"><span class="status">${t('online')}</span></div>
           <div class="col ip"></div>
+          <div class="col url"></div>
           <div class="col seen"></div>`
         container.appendChild(row)
         this._rows.set(site.id, row)
@@ -131,6 +137,25 @@ class SaSitesLocal extends HTMLElement {
         ip.appendChild(a)
       } else {
         ip.textContent = t('unknown')
+      }
+
+      // Where the unit can be reached from anywhere, once it has a name. The
+      // server reports it: a partner's sites are on the partner's own domain.
+      const url = row.querySelector('.url')
+      url.innerHTML = ''
+      const link = document.createElement('a')
+      if (site.url) {
+        link.href = site.url
+        link.target = '_blank'
+        link.rel = 'noreferrer'
+        link.textContent = new URL(site.url).host
+        url.appendChild(link)
+      } else if (site.uid_match) {
+        // Not reachable yet, and it is the unit this page was opened for — so
+        // this is the row that can be given a name and a cloud address.
+        link.href = `/sites/register?uid=${encodeURIComponent(this._uid())}`
+        link.textContent = t('access_via_cloud')
+        url.appendChild(link)
       }
 
       row.querySelector('.seen').textContent = timeAgo(site.last_seen_at)

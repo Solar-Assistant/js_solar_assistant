@@ -121,6 +121,13 @@ export function resolveApi(el) {
   return apiClient(token)
 }
 
+// Where to come back to after signing in. The whole URL, not just the path: a
+// link from a device carries its route and parameters in the fragment, and
+// signing in is a full navigation that would otherwise drop them.
+export function returnToHere() {
+  return `${location.pathname}${location.search}${location.hash}`
+}
+
 // The device learns its own host from this token, so a link that came from one
 // gets followed back. Returns false when there is nothing to follow.
 export function followDeviceCallback(el, token) {
@@ -134,5 +141,5 @@ export function followDeviceCallback(el, token) {
 export function redirectToSignIn(el) {
   clearSession('sa_token')
   const signIn = el.getAttribute('sign-in') || '/sign_in'
-  window.location.href = `${signIn}?return_to=${encodeURIComponent(location.pathname)}`
+  window.location.href = `${signIn}?return_to=${encodeURIComponent(returnToHere())}`
 }

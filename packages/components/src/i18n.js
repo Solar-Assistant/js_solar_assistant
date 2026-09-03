@@ -126,6 +126,8 @@ const MESSAGES = {
     local_network_devices: 'Local network devices',
     status: 'Status',
     network_ip: 'Network IP',
+    url: 'URL',
+    access_via_cloud: 'Access via cloud',
     connected: 'Connected',
     online: 'Online',
     unknown: 'Unknown',

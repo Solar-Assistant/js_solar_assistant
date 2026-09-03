@@ -1,4 +1,5 @@
 import { apiClient, readToken } from '@solar-assistant/api'
+import { returnToHere } from './sites-shared.js'
 import './sa-sites-index.js'
 import './sa-sites-show.js'
 import './sa-sites-invite.js'
@@ -37,7 +38,7 @@ class SaSites extends HTMLElement {
     const token = readToken('sa_token')
     if (!token) {
       window.location.href =
-        `${this.getAttribute('sign-in') || '/sign_in'}?return_to=${encodeURIComponent(location.pathname)}`
+        `${this.getAttribute('sign-in') || '/sign_in'}?return_to=${encodeURIComponent(returnToHere())}`
       return
     }
 
