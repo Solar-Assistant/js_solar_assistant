@@ -162,9 +162,37 @@ class SaSignIn extends HTMLElement {
       return
     }
 
-    // Default: sign-in form. Skip it if already signed in.
-    if (readToken('sa_token')) { window.location.replace(this._returnTo()); return }
+    // Default: sign-in form. Skip it if already signed in — unless the same
+    // destination already sent us here, which means our token does not open it.
+    // /sites/offline is served by the cloud on a partner's domain and wants a
+    // session cookie a portal never sets, so replacing back would loop forever.
+    if (readToken('sa_token')) {
+      const target = this._returnTo()
+      if (!this._bouncedFrom(target)) { window.location.replace(target); return }
+      // It sent us straight back. The visitor is signed in, so a sign-in form
+      // would be a lie; send them where signing in lands instead.
+      const landing = this.getAttribute('return-to') || '/sites'
+      if (landing !== target) { window.location.replace(landing); return }
+    }
     this._show(this._tags.form)
+  }
+
+  // True when we sent the browser to this same place a moment ago, so it has
+  // come straight back. A redirect round trip takes milliseconds; anything
+  // slower is someone opening the page again on purpose and should be retried.
+  // Tab-scoped, and absent memory (private mode) simply means no detection.
+  _bouncedFrom(target) {
+    const KEY = 'sa_return_to_attempt'
+    const WINDOW_MS = 5000
+    try {
+      const seen = JSON.parse(sessionStorage.getItem(KEY) || 'null')
+      if (seen && seen.target === target && Date.now() - seen.at < WINDOW_MS) {
+        sessionStorage.removeItem(KEY)
+        return true
+      }
+      sessionStorage.setItem(KEY, JSON.stringify({ target, at: Date.now() }))
+    } catch { /* no storage: no detection, same behaviour as before */ }
+    return false
   }
 
   _show(tag) {

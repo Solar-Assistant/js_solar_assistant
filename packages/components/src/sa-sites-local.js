@@ -1,25 +1,8 @@
 import { cardStyles } from './styles.js'
-import { resolveApi, redirectToSignIn } from './sites-shared.js'
+import { resolveApi, redirectToSignIn, timeAgo } from './sites-shared.js'
 import { t } from './i18n.js'
 
 const POLL_MS = 5000
-
-// numeric:'auto' is what gives "yesterday" rather than "1 day ago".
-const UNITS = [
-  ['year', 31536000], ['month', 2592000], ['day', 86400],
-  ['hour', 3600], ['minute', 60], ['second', 1],
-]
-
-function timeAgo(iso) {
-  if (!iso) return '—'
-  const seconds = (new Date(iso).getTime() - Date.now()) / 1000
-  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
-  for (const [unit, size] of UNITS) {
-    if (Math.abs(seconds) >= size || unit === 'second') {
-      return rtf.format(Math.round(seconds / size), unit)
-    }
-  }
-}
 
 function makeTemplate() {
   return `
@@ -37,7 +20,6 @@ function makeTemplate() {
     .head { font-weight: 600; }
     .col { flex: 1 1 0; min-width: 0; }
     .col-status { flex: 0 0 90px; }
-    a { color: var(--sa-primary, #475569); }
     /* Shown only once a device answers on this network. See _probe(). */
     .status { color: transparent; }
     .online .status { color: #16a34a; font-weight: 600; }

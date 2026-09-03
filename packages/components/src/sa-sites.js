@@ -4,6 +4,7 @@ import './sa-sites-index.js'
 import './sa-sites-show.js'
 import './sa-sites-invite.js'
 import './sa-sites-register.js'
+import './sa-sites-offline.js'
 
 // <sa-sites> is a hash router. It mounts one outlet per route, keeps them alive
 // (toggling `hidden` so state/cache survives navigation), and hands each its API
@@ -22,6 +23,7 @@ import './sa-sites-register.js'
 //   #local?uid=…                 local          uid
 //   #activate?uid=…&callback=…   activate       uid, callback
 //   #register?uid=…&callback=…   register       uid, callback
+//   #offline?host=…              offline        host
 const ROUTES = [
   { test: h => h === '',                outlet: 'index' },
   { test: h => /^\d+$/.test(h),         outlet: 'show',     param: 'site-id', value: h => h },
@@ -31,6 +33,7 @@ const ROUTES = [
   { test: h => /^local(\?|$)/.test(h),    outlet: 'local',    query: ['uid'] },
   { test: h => /^activate(\?|$)/.test(h), outlet: 'activate', query: ['uid', 'callback'] },
   { test: h => /^register(\?|$)/.test(h), outlet: 'register', query: ['uid', 'callback'] },
+  { test: h => /^offline(\?|$)/.test(h),  outlet: 'offline',  query: ['host'] },
 ]
 
 class SaSites extends HTMLElement {
@@ -50,6 +53,7 @@ class SaSites extends HTMLElement {
       show:     this.getAttribute('show')     || 'sa-sites-show',
       invite:   this.getAttribute('invite')   || 'sa-sites-invite',
       register: this.getAttribute('register') || 'sa-sites-register',
+      offline:  this.getAttribute('offline')  || 'sa-sites-offline',
       resetPassword: this.getAttribute('reset-password') || 'sa-sites-reset-password',
       local:    this.getAttribute('local')    || 'sa-sites-local',
       activate: this.getAttribute('activate') || 'sa-sites-activate',

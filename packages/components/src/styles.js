@@ -5,6 +5,13 @@
 // --sa-* custom properties (which pierce shadow DOM).
 
 export const cardStyles = `
+  /* :visited repeats the same colour deliberately. A portal shows the same site
+     list to everyone, so a purple row says only "you have been here before" —
+     noise on a dashboard, and a small history leak on a shared screen.
+     :where() keeps this at zero specificity: a bare a:visited scores higher than
+     a class, so it would paint a button's label its own background colour.
+     Author styles beat the browser's purple whatever the specificity. */
+  :where(a, a:visited) { color: var(--sa-primary, #475569); }
   .card {
     background: #fff;
     border: 1px solid var(--sa-border, #e3e5e6);

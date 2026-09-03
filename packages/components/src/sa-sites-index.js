@@ -1,3 +1,4 @@
+import { siteUrl } from '@solar-assistant/api'
 import { sitesStyles, caption, resolveApi, redirectToSignIn } from './sites-shared.js'
 import { accentBlockStyles } from './styles.js'
 import { t } from './i18n.js'
@@ -57,7 +58,9 @@ class SaSitesIndex extends HTMLElement {
               return `
                 <tr>
                   <td>
-                    <div class="site-caption">${escapeHtml(caption(site))}</div>
+                    <div class="site-caption">${siteUrl(site)
+                      ? `<a href="${escapeHtml(siteUrl(site))}" target="_blank" rel="noreferrer">${escapeHtml(caption(site))}</a>`
+                      : escapeHtml(caption(site))}</div>
                     ${site.description ? `<div class="site-hardware">${escapeHtml(site.description)}</div>` : ''}
                   </td>
                   <td class="site-owner">${escapeHtml(ownerName)}</td>

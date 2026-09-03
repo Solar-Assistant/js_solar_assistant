@@ -33,6 +33,7 @@ export function apiClient(token) {
   return {
     get:    (path, params) => fetch(`${BASE}${path}${buildQuery(params)}`, { headers }),
     post:   (path, body) =>   fetch(`${BASE}${path}`, { method: 'POST',   headers, body: JSON.stringify(body) }),
+    put:    (path, body) =>   fetch(`${BASE}${path}`, { method: 'PUT',    headers, body: JSON.stringify(body) }),
     patch:  (path, body) =>   fetch(`${BASE}${path}`, { method: 'PATCH',  headers, body: JSON.stringify(body) }),
     delete: path =>           fetch(`${BASE}${path}`, { method: 'DELETE', headers }),
   }

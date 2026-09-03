@@ -16,7 +16,7 @@ function makeTemplate() {
     .sent { color: #16a34a; font-weight: 600; margin: 0 0 8px; }
     .reassure { margin: 0 0 14px; }
     .error { color: #b91c1c; }
-    a { color: var(--sa-primary, #475569); cursor: pointer; }
+    a { cursor: pointer; }
     [hidden] { display: none; }
   </style>
   <div class="heading">

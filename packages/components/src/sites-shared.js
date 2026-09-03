@@ -55,6 +55,10 @@ export const sitesStyles = `
   }
   .form-field label { min-width: 130px; color: #6b7280; font-size: 13px; flex-shrink: 0; }
   .form-value { color: #111827; }
+  /* The dotted underline browsers already give abbr[title], for the same reason:
+     a native tooltip has no affordance of its own. The help cursor that usually
+     comes with this is nobody's default — measured — so it is not here. */
+  time[title] { text-decoration: underline dotted; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
   thead td { font-weight: 600; padding-bottom: 8px; color: #374151; }
   tbody td { padding: 6px 0; color: #111827; border-top: 1px solid var(--sa-border, #d1d5db); vertical-align: middle; }
@@ -93,6 +97,26 @@ export function field(label, value) {
   return `<div class="form-field"><label>${label}</label><div class="form-value">${escapeHtml(value)}</div></div>`
 }
 
+// A moment, as words, with the exact timestamp on hover. <time> carries the
+// machine-readable value; `title` is the whole tooltip — a native one needs no
+// library, is reachable by keyboard and screen reader, and costs nothing in a
+// bundle every partner's portal loads.
+export function timeField(label, iso) {
+  if (!iso) return ''
+  return `<div class="form-field"><label>${label}</label><div class="form-value">` +
+    `<time datetime="${escapeHtml(iso)}" title="${escapeHtml(formatDate(iso))}">${escapeHtml(timeAgo(iso))}</time>` +
+    `</div></div>`
+}
+
+// A field whose value is a link out. Kept beside field() so the same rule holds:
+// the label is ours, the text and the href came from the API and never are.
+export function linkField(label, text, href) {
+  if (!text) return ''
+  return `<div class="form-field"><label>${label}</label><div class="form-value">` +
+    `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(text)}</a>` +
+    `</div></div>`
+}
+
 // Display name for a site — mirrors SACloud.Site.caption/1.
 export function caption(site) {
   return site.name && site.name.length ? site.name : `Unregistered #${site.id}`
@@ -102,9 +126,33 @@ export function registered(site) {
   return !!(site.name && site.name.length)
 }
 
+// numeric:'auto' is what gives "yesterday" rather than "1 day ago".
+const UNITS = [
+  ['year', 31536000], ['month', 2592000], ['day', 86400],
+  ['hour', 3600], ['minute', 60], ['second', 1],
+]
+
+export function timeAgo(iso) {
+  if (!iso) return '—'
+  const seconds = (new Date(iso).getTime() - Date.now()) / 1000
+  const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+  for (const [unit, size] of UNITS) {
+    if (Math.abs(seconds) >= size || unit === 'second') {
+      return rtf.format(Math.round(seconds / size), unit)
+    }
+  }
+}
+
 export function formatDate(iso) {
   if (!iso) return null
   return new Date(iso).toLocaleString()
+}
+
+// A build is named by its day, not the moment it was cut, so the time is noise.
+// Read in UTC so the day cannot shift backwards for a visitor behind it.
+export function formatDay(iso) {
+  if (!iso) return null
+  return new Date(iso).toLocaleDateString(undefined, { timeZone: 'UTC' })
 }
 
 // Returns an authenticated API client for an outlet element. The <sa-sites>

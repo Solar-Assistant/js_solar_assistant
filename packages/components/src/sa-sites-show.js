@@ -1,5 +1,5 @@
 import { siteUrl, normalizeRole } from '@solar-assistant/api'
-import { sitesStyles, field, caption, registered, formatDate, resolveApi, redirectToSignIn } from './sites-shared.js'
+import { sitesStyles, field, caption, registered, resolveApi, redirectToSignIn, formatDay, linkField, timeField } from './sites-shared.js'
 import { t } from './i18n.js'
 import { escapeHtml } from './escape.js'
 
@@ -106,9 +106,9 @@ class SaSitesShow extends HTMLElement {
         ${site.local_ip || site.build_date || site.last_seen_at ? `
           <div class="heading">${t('device_info')}</div>
           <div class="card"><div class="card-section">
-            ${field(t('local_ip'), site.local_ip)}
-            ${field(t('last_seen'), formatDate(site.last_seen_at))}
-            ${field(t('software_build'), formatDate(site.build_date))}
+            ${linkField(t('local_ip'), site.local_ip, `http://${site.local_ip}`)}
+            ${timeField(t('last_seen'), site.last_seen_at)}
+            ${field(t('software_build'), formatDay(site.build_date))}
           </div></div>
         ` : ''}
       `
