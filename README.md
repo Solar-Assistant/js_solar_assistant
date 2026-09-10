@@ -4,15 +4,19 @@ Most organizations pick one of the SolarAssistant ready-made portal templates an
 code, or open a GitHub account: choose a template on your organization's portal page and that is your
 live portal, carrying your name, colours and logo, hosted by us.
 [`Solar-Assistant/portal-minimal`](https://github.com/Solar-Assistant/portal-minimal) is the one you
-get unless you pick another.
+get unless you pick another. We believe a custom web portal is an essential part of your solar
+business: [read more on why we think so](docs/approach.md).
 
-This repository is the two packages those pages are built from: the web components and the API
+Some organizations use SolarAssistant as a data source instead, and give their customers a "Connect
+SolarAssistant" button in a product of their own. The customer signs in to SolarAssistant, chooses
+which of their sites to share, and your application receives a token for it. Nobody hands over a
+password, and nobody pastes an API token into your app.
+See [OAuth: Connect SolarAssistant](docs/oauth.md).
+
+This repository is the three packages behind both: the web components, the API client, and the OAuth
 client. The easiest way in is our CDN: one script tag on the page, nothing to install or build. Start
 from a template and you are already using it; write your own pages and this is what you write them
 with.
-
-We believe a custom web portal is an essential part of your solar business.
-[Read more on why we think so](docs/approach.md).
 
 ## Setup steps
 
@@ -35,7 +39,7 @@ All of these are on your organization's portal page, `https://solar-assistant.io
 | **Customization** | CSS only: colors, borders, and corner radius via CSS variables. | Unlimited. You own the markup and styles. |
 | **Guide** | [Components guide →](docs/components.md) | [API reference →](docs/api.md) |
 
-Further reading: [Making monitoring feel part of your website](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [Versions and pinning](docs/versions.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
+Further reading: [Making monitoring feel part of your website](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [OAuth: Connect SolarAssistant](docs/oauth.md) · [Versions and pinning](docs/versions.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
 
 Both are framework-agnostic and ship from this repository. Pick per page, or mix them.
 
@@ -55,6 +59,24 @@ The script tag those pages carry:
 That URL always serves the newest release. For a site you are leaving running,
 point at a major version — `…/js/v1/solar-assistant.js` — or pin an exact one.
 See [Versions and pinning](docs/versions.md).
+
+## Adding an OAuth "Connect SolarAssistant" to your app
+
+`@solar-assistant/oauth` puts that button in your own product. Your users already run
+SolarAssistant: they click it, choose which of their sites to share, and you receive a token for
+that site. No passwords, and nobody pastes an API token into your app.
+
+This is the third-party case rather than the portal one: the components and the API client above
+are for a partner whose customers are their own and who sign in to SolarAssistant directly.
+
+```js
+const client = SolarAssistantOAuth.oauthClient({ clientId, redirectUri })
+const tokens = await client.complete()                       // on load
+location.assign(await client.authorizeUrl())                 // on your Connect button
+```
+
+The token then goes to the API client exactly as any other does. Applications are registered on
+your organization's Applications page: [OAuth guide →](docs/oauth.md)
 
 ## Development
 

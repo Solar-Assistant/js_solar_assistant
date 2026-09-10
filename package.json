@@ -9,7 +9,7 @@
     "vitest": "^3.2.7"
   },
   "scripts": {
-    "build": "vite build && vite build -c vite.config.api.js",
+    "build": "vite build && vite build -c vite.config.api.js && vite build -c vite.config.oauth.js",
     "test": "vitest run"
   }
 }

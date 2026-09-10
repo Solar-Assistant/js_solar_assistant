@@ -1,5 +1,9 @@
 # Authentication
 
+There are three ways to hold a token. A user signing in with email and password, and auth
+transfer from your own app, are both below. The third is [OAuth](oauth.md), which is for a third
+party reading sites that belong to somebody else rather than a partner running their own portal.
+
 The SolarAssistant API uses bearer tokens. A user signs in with email and password,
 receives a token, and that token is included in every subsequent API request. The token is stored in the
 browser under `sa_token` — in `localStorage` to keep the user signed in across

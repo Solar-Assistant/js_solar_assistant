@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect SolarAssistant: OAuth example</title>
+<style>
+  :root { color-scheme: light dark; --line: color-mix(in srgb, currentColor 18%, transparent) }
+  body { font: 15px/1.55 system-ui, sans-serif; margin: 0 auto; padding: 2rem 1rem; max-width: 46rem }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem }
+  p.lead { margin: 0 0 2rem; opacity: .7 }
+  fieldset { border: 1px solid var(--line); border-radius: .5rem; padding: 1rem; margin: 0 0 1rem }
+  legend { padding: 0 .4rem; font-weight: 600 }
+  label { display: block; margin: .3rem 0 }
+  button { font: inherit; padding: .55rem 1.1rem; border-radius: .4rem; border: 1px solid var(--line); cursor: pointer }
+  button.primary { background: #1a7f5a; color: #fff; border-color: transparent }
+  button:disabled { opacity: .5; cursor: default }
+  pre { background: color-mix(in srgb, currentColor 7%, transparent); padding: .75rem; border-radius: .4rem; overflow-x: auto; font-size: 13px }
+  .error { color: #b3261e }
+  [hidden] { display: none }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "@solar-assistant/oauth": "/packages/oauth/src/index.js",
+    "@solar-assistant/api": "/packages/api/src/index.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<h1>Connect SolarAssistant</h1>
+<p class="lead">The authorization code flow with PKCE, running from source with no build step.</p>
+
+<fieldset id="setup">
+  <legend>Application</legend>
+  <label>Application id <input id="client-id" size="28" placeholder="from your organization's Applications page"></label>
+  <label>Redirect URI <input id="redirect-uri" size="40" readonly></label>
+  <p class="lead">The redirect URI must be registered on the application exactly as shown.</p>
+</fieldset>
+
+<fieldset>
+  <legend>Scopes</legend>
+  <label><input type="checkbox" value="openid" checked> <code>openid</code> basic profile</label>
+  <label><input type="checkbox" value="sites:read_single" checked> <code>sites:read_single</code> one site the user picks</label>
+  <p><button id="connect" class="primary">Connect SolarAssistant</button></p>
+</fieldset>
+
+<p id="message"></p>
+
+<fieldset id="result" hidden>
+  <legend>Granted</legend>
+  <div id="granted"></div>
+  <p><button id="call-api">Call the API with this token</button> <button id="forget">Forget</button></p>
+  <pre id="api-output" hidden></pre>
+</fieldset>
+
+<fieldset id="keep" hidden>
+  <legend>Keep the access</legend>
+  <p>The token above lasts 24 hours and there is no refresh token. To go on reading this site
+  after it lapses, record the user's consent against your organization. Your own API token then
+  reads the site, and you never send the user through this flow again.</p>
+  <p class="lead">This outlives the token. The site stays readable by everyone in your
+  organization until the grant is removed, and today it can only be removed by us.</p>
+  <p><button id="keep-site">Add this site to my organization</button></p>
+  <p id="keep-result"></p>
+</fieldset>
+
+<script type="module">
+import { oauthClient, decodeIdToken } from '@solar-assistant/oauth'
+import { apiClient } from '@solar-assistant/api'
+
+const REDIRECT_URI = `${location.origin}/oauth/callback`
+const TOKEN_KEY = 'sa_oauth_example_token'
+
+// The application id is not a secret, but it is yours rather than ours, so it is passed in
+// once (?client_id=...) and remembered here instead of being committed to this file.
+const clientId = new URL(location.href).searchParams.get('client_id') || localStorage.getItem('sa_oauth_example_client') || ''
+if (clientId) localStorage.setItem('sa_oauth_example_client', clientId)
+
+const $ = id => document.getElementById(id)
+const message = (text, error) => { $('message').textContent = text; $('message').className = error ? 'error' : '' }
+
+$('client-id').value = clientId
+$('redirect-uri').value = REDIRECT_URI
+$('client-id').addEventListener('change', event => localStorage.setItem('sa_oauth_example_client', event.target.value.trim()))
+
+const scopes = () => [...document.querySelectorAll('fieldset input[type=checkbox]:checked')].map(box => box.value)
+
+const client = () => oauthClient({ clientId: $('client-id').value.trim(), redirectUri: REDIRECT_URI })
+
+$('connect').addEventListener('click', async () => {
+  try {
+    location.assign(await client().authorizeUrl(scopes()))
+  } catch (error) {
+    message(error.message, true)
+  }
+})
+
+$('forget').addEventListener('click', () => {
+  sessionStorage.removeItem(TOKEN_KEY)
+  location.assign('/')
+})
+
+$('keep-site').addEventListener('click', async () => {
+  const { access_token, scope_detail } = JSON.parse(sessionStorage.getItem(TOKEN_KEY))
+  const siteId = scope_detail?.['sites:read_single']?.id
+
+  // The organization and the application are read from the token, not from what we send, so a
+  // token can only ever add a site to the organization that owns the application it belongs to.
+  const response = await apiClient(access_token).post('/organization_sites', { site_id: siteId })
+  const body = await response.json().catch(() => null)
+
+  $('keep-result').textContent = response.ok
+    ? `Site ${siteId} is now readable by your organization with your own API token.`
+    : `Refused: ${body?.error?.message ?? body?.error ?? response.status}`
+  $('keep-result').className = response.ok ? '' : 'error'
+  $('keep-site').disabled = response.ok
+})
+
+$('call-api').addEventListener('click', async () => {
+  const { access_token, scope_detail } = JSON.parse(sessionStorage.getItem(TOKEN_KEY))
+  const api = apiClient(access_token)
+  const siteId = scope_detail?.['sites:read_single']?.id
+
+  const answers = { '/user': await api.get('/user').then(r => r.json()) }
+  if (siteId) answers[`/sites/${siteId}`] = await api.get(`/sites/${siteId}`).then(r => r.json())
+
+  $('api-output').hidden = false
+  $('api-output').textContent = JSON.stringify(answers, null, 2)
+})
+
+function show(tokens) {
+  sessionStorage.setItem(TOKEN_KEY, JSON.stringify(tokens))
+
+  const claims = tokens.id_token ? decodeIdToken(tokens.id_token) : null
+  $('granted').innerHTML = `
+    <p>Access token, expires in ${tokens.expires_in ?? 'unknown'} seconds:</p>
+    <pre>${tokens.access_token}</pre>
+    <p>Scope:</p><pre>${JSON.stringify(tokens.scope_detail ?? tokens.scope, null, 2)}</pre>
+    ${claims ? `<p>Signed-in user, from the id_token:</p><pre>${JSON.stringify(claims, null, 2)}</pre>` : ''}`
+  $('result').hidden = false
+  $('keep').hidden = !tokens.scope_detail?.['sites:read_single']
+  $('setup').hidden = true
+}
+
+try {
+  const tokens = clientId ? await client().complete() : null
+  if (tokens) {
+    history.replaceState(null, '', '/')
+    message('Connected.')
+    show(tokens)
+  } else if (!clientId) {
+    message('Add your application id above, or load this page with ?client_id=<id>.')
+  }
+} catch (error) {
+  message(error.message, true)
+}
+</script>
+
+</body>
+</html>

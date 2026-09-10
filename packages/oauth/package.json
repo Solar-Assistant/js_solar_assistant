@@ -1,0 +1,14 @@
+{
+  "name": "@solar-assistant/oauth",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "scripts": {
+    "example": "node example/browser/serve.js",
+    "example:server": "node example/server/server.js"
+  }
+}
