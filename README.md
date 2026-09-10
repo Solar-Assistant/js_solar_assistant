@@ -71,7 +71,14 @@ packages/
 
 ```bash
 npm install
+npm test
 ```
+
+`npm test` runs the suite under [Vitest](https://vitest.dev) and happy-dom: the
+pure functions, and the `<sa-sites>` router mounted with a stubbed `fetch`. Every
+outlet takes its API client from `el.api`, so a replacement outlet is testable the
+same way, with no network and no token. See
+[Swapping an outlet](docs/customizing.md#swapping-an-outlet).
 
 Two files are published to `cdn.solar-assistant.io/js/`:
 

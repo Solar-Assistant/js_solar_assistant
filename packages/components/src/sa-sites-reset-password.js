@@ -70,7 +70,9 @@ class SaSitesResetPassword extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'site-id' && oldValue !== null && oldValue !== newValue && this._api) this._load()
+    // Not `oldValue !== null`: the router sets the param after appending, so the
+    // first set is the one that matters and skipping it never loads at all.
+    if (name === 'site-id' && oldValue !== newValue && this._api) this._load()
   }
 
   async _load() {

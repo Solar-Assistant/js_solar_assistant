@@ -120,21 +120,23 @@ Omit any attribute you don't need to customise — its default stays in place.
 
 ## What the router provides
 
-When your outlet is mounted, the router sets these before it connects to the DOM:
+The client, the user and the sign-in path arrive before your element is appended.
+**The route param arrives after it** — so your element connects, and runs, before
+it knows which site or device it is for.
 
-| What | How it arrives |
-|---|---|
-| Authenticated API client | `el.api` (JS property) |
-| Signed-in user | `el.currentUser` (JS property) |
-| Sign-in redirect URL | `sign-in` attribute |
-| Site ID (show/invite) | `site-id` attribute, updated on every navigation |
+| What | How it arrives | When |
+|---|---|---|
+| Authenticated API client | `el.api` (JS property) | before connecting |
+| Signed-in user | `el.currentUser` (JS property) | before connecting, and again once it loads |
+| Sign-in redirect URL | `sign-in` attribute | before connecting |
+| Route param — `site-id`, `uid`, `callback`, `host` | attribute, updated on every navigation | **after connecting** |
 
 ## Outlet contract
 
 Your element must:
 
 1. Read `this.api` to call the Solar Assistant API — it is an authenticated `apiClient` instance.
-2. Declare `static get observedAttributes() { return ['site-id'] }` and reload in `attributeChangedCallback` — the router updates the attribute when the user navigates to a different site without unmounting.
+2. Declare `static get observedAttributes() { return ['site-id'] }` and load from `attributeChangedCallback` — the router updates the attribute when the user navigates to a different site without unmounting. Two things follow from the param arriving after your element connects: don't skip the first change (`oldValue !== null` skips the only change the router makes, and the outlet never loads at all), and don't load in `connectedCallback` without checking the param is there yet (it isn't, so the request fails and paints an error over the real load a moment later).
 3. Navigate by setting `location.hash`:
    - `location.hash = ''` → back to the site list
    - `location.hash = id` → open a site detail
