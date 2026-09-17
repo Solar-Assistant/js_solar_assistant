@@ -38,7 +38,7 @@ element with your own implementation.
 | Outlet | API calls | Observed attribute | Navigates to |
 |---|---|---|---|
 | `sa-sites-index` | `GET /sites` | — | `#<id>` on row click |
-| `sa-sites-show` | `GET /sites/:id`, `PATCH /sites/:id/users/:uid`, `DELETE /sites/:id/users/:uid` | `site-id` | `#` (back), `#<id>/invite` |
+| `sa-sites-show` | `GET /sites/:id`, `PATCH /sites/:id/name`, `PATCH /sites/:id/users/:uid`, `DELETE /sites/:id/users/:uid` | `site-id` | `#` (back), `#<id>/invite`, the device's own activate page after a rename |
 | `sa-sites-invite` | `GET /sites/:id`, `POST /sites/:id/users` | `site-id` | `#<id>` on success/back |
 | `sa-sites-register` | `POST /sites/register` | `uid` | `#<id>` on success |
 | `sa-sites-reset-password` | `POST /sites/:id/authorize` | `site-id` | `#` (back) |

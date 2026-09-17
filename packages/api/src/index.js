@@ -43,6 +43,16 @@ export function apiClient(token) {
 // Roles: 'viewer' (Viewer), 'admin' (Admin), 'owner' (transfers ownership, only if current user is owner).
 // The API used to read back 'member' for a viewer and now reads back 'viewer'. Writes accept either —
 // anything that isn't 'admin' or 'owner' is a viewer — so send 'viewer' and normalize on read.
+// One of SolarAssistant's legal documents, as an HTML fragment. Not on apiClient
+// because it is public and returns markup rather than JSON: there is no session
+// to authenticate and nothing to parse. The organization is named the same way
+// register and sign-in name it, rather than left for the hostname to imply;
+// without an id it falls back to resolution from the request's Origin.
+export function legalDocument(name, organizationId) {
+  const org = organizationId ? `&organization_id=${encodeURIComponent(organizationId)}` : ''
+  return fetch(`${BASE}/legal/portal/${encodeURIComponent(name)}?fragment=1${org}`)
+}
+
 export function inviteRoles(site, currentUser) {
   const base = ['viewer', 'admin']
   if (currentUser && site.owner?.id === currentUser.id) return [...base, 'owner']
