@@ -18,16 +18,15 @@ client. The easiest way in is our CDN: one script tag on the page, nothing to in
 from a template and you are already using it; write your own pages and this is what you write them
 with.
 
-## Setup steps
+## Set up your portal
 
-All of these are on your organization's portal page, `https://solar-assistant.io/organizations/<id>/portal`.
+Turn on a preview from the **Cloud portal** tab of your organization, publish it when you are happy,
+and point your own domain at it if you like. When you want more than colours and a logo, the portal
+is your own HTML, CSS and JavaScript, which an AI coding assistant can change for you.
 
-1. **Preview it.** Click **Preview custom portal** and it is live immediately on `<your-org>.solar-power.live` — nothing to deploy and no DNS to set up. That first label comes from your organization's name; it is yours to change, and to clear again, right up until you publish.
-2. **Publish it.** **Publish preview** makes it the portal your customers are sent to: from then on, the links we email them and the link from their SolarAssistant monitoring device both go there.
-3. **Use your own domain** — optional. **Configure** next to Custom domain, enter it, and add the CNAME record it shows you. We check the record resolves before treating the domain as live.
-4. **Bring your own code** — optional. Fork one of our templates, change what you like, and connect your repository on the same page. Your portal is then your own HTML, CSS and JavaScript, still hosted by us: choose a revision to stage, look at it on the staging address, and mark it live when you are happy.
+**[Set up your custom portal →](https://solar-assistant.io/help/organizations/custom-portal)**
 
-<img src="docs/org-config.png" width="340" alt="Organization branding and configuration in SolarAssistant"> <img src="docs/site-view.png" width="340" alt="Site detail view in SolarAssistant">
+<img src="docs/portal.png" width="720" alt="A partner portal carrying its own brand, showing a customer's site">
 
 ## Choose your level of control
 
