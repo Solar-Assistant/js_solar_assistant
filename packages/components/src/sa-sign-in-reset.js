@@ -10,7 +10,10 @@ const ORIGIN = new URL(BASE).origin
 class SaSignInReset extends HTMLElement {
   connectedCallback() {
     this.attachShadow({ mode: 'open' })
-    this.shadowRoot.innerHTML = `<style>${signInStyles}</style><div class="view"></div>`
+    this.shadowRoot.innerHTML = `<style>${signInStyles}
+      .verify { display: flex; justify-content: center; margin-top: -8px; }
+      .verify iframe { border: 0; width: 100%; height: 70px; }
+    </style><div class="view"></div>`
     this._verifyToken = ''
     this._onMessage = e => {
       if (e.origin !== ORIGIN || !e.data) return
@@ -49,7 +52,7 @@ class SaSignInReset extends HTMLElement {
           <h2>${t('reset_password')}</h2>
           <p class="sub">${t('reset_sub')}</p>
           <input type="email" name="email" placeholder="${t('email')}" autocomplete="email" required />
-          <div class="verify"><iframe src="${ORIGIN}/register/verify" title="Verification" style="border:0;width:100%;height:70px;"></iframe></div>
+          <div class="verify"><iframe src="${ORIGIN}/register/verify" title="Verification"></iframe></div>
           <button type="submit">${t('send_reset_link')}</button>
           <button type="button" class="link back">${t('back_to_sign_in')}</button>
           <span class="error"></span>

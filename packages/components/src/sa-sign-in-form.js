@@ -6,7 +6,9 @@ export const signInStyles = `
   :host { display: block; font-family: inherit; }
   :host([hidden]) { display: none; }
   ${cardStyles}
-  form { display: flex; flex-direction: column; gap: 12px; width: 280px; }
+  /* 300px, the fixed width of the Turnstile widget the reset form embeds, and the
+     same width registration uses, so every auth screen lines up. */
+  form { display: flex; flex-direction: column; gap: 12px; width: 300px; }
   h2 { margin: 0; font-size: 18px; font-weight: 600; }
   .sub { margin: 0; font-size: 13px; color: #6b7280; }
   input {
@@ -38,7 +40,7 @@ export const signInStyles = `
     background: none; border: none; padding: 0; text-align: left;
   }
   .link:hover { text-decoration: underline; }
-  .notice { width: 280px; font-size: 14px; line-height: 1.5; color: #111827; }
+  .notice { width: 300px; font-size: 14px; line-height: 1.5; color: #111827; }
 `
 
 // Default sign-in outlet for <sa-sign-in>. Reads organization-id and return-to
