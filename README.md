@@ -39,7 +39,7 @@ All of these are on your organization's portal page, `https://solar-assistant.io
 | **Customization** | CSS only: colors, borders, and corner radius via CSS variables. | Unlimited. You own the markup and styles. |
 | **Guide** | [Components guide →](docs/components.md) | [API reference →](docs/api.md) |
 
-Further reading: [Making monitoring feel part of your website](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [OAuth: Connect SolarAssistant](docs/oauth.md) · [Versions and pinning](docs/versions.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
+Further reading: [Making monitoring feel part of your website](docs/platforms.md) · [Authentication & auth transfer](docs/authentication.md) · [OAuth: Connect SolarAssistant](docs/oauth.md) · [Database: keeping your own data](docs/database.md) · [Versions and pinning](docs/versions.md) · [Customizing outlets](docs/customizing.md) · [Locale & translations](docs/i18n.md)
 
 Both are framework-agnostic and ship from this repository. Pick per page, or mix them.
 
@@ -60,14 +60,27 @@ That URL always serves the newest release. For a site you are leaving running,
 point at a major version — `…/js/v1/solar-assistant.js` — or pin an exact one.
 See [Versions and pinning](docs/versions.md).
 
+## Add your own database
+
+Your portal may want to keep data of its own against the signed-in customer: service notes,
+maintenance records, preferences. SolarAssistant is a standard OpenID Connect provider, so a hosted
+database such as [Supabase](https://supabase.com) can sign your customers in with their
+SolarAssistant account and enforce row-level security on the result. You run no backend and store
+no passwords.
+
+An application on your organization's Applications page, a custom OIDC provider in Supabase, and
+one call from your page: [Database guide →](docs/database.md)
+
 ## Adding an OAuth "Connect SolarAssistant" to your app
 
-`@solar-assistant/oauth` puts that button in your own product. Your users already run
-SolarAssistant: they click it, choose which of their sites to share, and you receive a token for
-that site. No passwords, and nobody pastes an API token into your app.
+This section is not a step in building a custom portal. It is for when you are integrating a product
+of your own with SolarAssistant and want a "Connect SolarAssistant" button in it, instead of
+building a SolarAssistant portal. Everything above is for a partner whose customers are their own
+and who sign in to SolarAssistant directly; if that is you, skip this.
 
-This is the third-party case rather than the portal one: the components and the API client above
-are for a partner whose customers are their own and who sign in to SolarAssistant directly.
+`@solar-assistant/oauth` puts that button in your product. Your users already run SolarAssistant:
+they click it, choose which of their sites to share, and you receive a token for that site. No
+passwords, and nobody pastes an API token into your app.
 
 ```js
 const client = SolarAssistantOAuth.oauthClient({ clientId, redirectUri })
