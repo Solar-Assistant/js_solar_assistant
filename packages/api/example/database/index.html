@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your own database: Supabase example</title>
+<style>
+  :root { color-scheme: light dark; --line: color-mix(in srgb, currentColor 18%, transparent) }
+  body { font: 15px/1.55 system-ui, sans-serif; margin: 0 auto; padding: 2rem 1rem; max-width: 46rem }
+  h1 { font-size: 1.4rem; margin: 0 0 .25rem }
+  h2 { font-size: 1.05rem; margin: 0 0 .5rem }
+  p.lead { margin: 0 0 2rem; opacity: .7 }
+  fieldset { border: 1px solid var(--line); border-radius: .5rem; padding: 1rem; margin: 0 0 1rem }
+  legend { padding: 0 .4rem; font-weight: 600 }
+  label { display: block; margin: .3rem 0 }
+  button { font: inherit; padding: .55rem 1.1rem; border-radius: .4rem; border: 1px solid var(--line); cursor: pointer }
+  button.primary { background: #1a7f5a; color: #fff; border-color: transparent }
+  button:disabled { opacity: .5; cursor: default }
+  pre { background: color-mix(in srgb, currentColor 7%, transparent); padding: .75rem; border-radius: .4rem; overflow-x: auto; font-size: 13px }
+  .error { color: #b3261e }
+  .ok { color: #1a7f5a }
+  [hidden] { display: none }
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "@solar-assistant/api": "/packages/api/src/index.js"
+  }
+}
+</script>
+</head>
+<body>
+
+<h1>Keep your own data</h1>
+<p class="lead">Signs a customer in to Supabase with their SolarAssistant account, without sending
+them to solar-assistant.io. Runs from source with no build step.</p>
+
+<fieldset id="setup">
+  <legend>Setup</legend>
+  <label>Supabase project URL <input id="supabase-url" size="40" placeholder="https://abcdefgh.supabase.co"></label>
+  <label>Supabase publishable key <input id="supabase-key" size="40" placeholder="sb_publishable_..."></label>
+  <label>Application client id <input id="client-id" size="28" placeholder="from your organization's Applications page"></label>
+  <label>Your organization id <input id="organization-id" size="8" placeholder="7"></label>
+  <p class="lead">Kept in this browser only. The application needs no redirect URI for this flow.</p>
+</fieldset>
+
+<form id="sign-in-form">
+  <fieldset>
+    <legend>1. Sign in to the portal</legend>
+    <label>Email <input id="email" type="email" autocomplete="username" size="32"></label>
+    <label>Password <input id="password" type="password" autocomplete="current-password" size="32"></label>
+    <button class="primary" type="submit">Sign in</button>
+    <pre id="sign-in-out" hidden></pre>
+  </fieldset>
+</form>
+
+<fieldset>
+  <legend>2. Exchange the session for an identity token, and sign in to Supabase</legend>
+  <p class="lead">Two requests: one to us for the token, one to Supabase to spend it.</p>
+  <button id="exchange" class="primary" disabled>Exchange and sign in</button>
+  <pre id="exchange-out" hidden></pre>
+</fieldset>
+
+<fieldset>
+  <legend>3. Prove row-level security</legend>
+  <p class="lead">Needs a table. Run this in the Supabase SQL editor first:</p>
+  <pre>create table service_notes (
+  id      bigint generated always as identity primary key,
+  user_id uuid not null default auth.uid(),
+  site_id bigint,
+  note    text not null
+);
+
+alter table service_notes enable row level security;
+
+create policy "own rows" on service_notes
+  for all using (user_id = auth.uid()) with check (user_id = auth.uid());</pre>
+  <label>Note <input id="note" size="40" value="Replaced the DC isolator"></label>
+  <button id="write" disabled>Write a row, then read it back</button>
+  <pre id="write-out" hidden></pre>
+</fieldset>
+
+<script type="module">
+import { BASE } from '@solar-assistant/api'
+
+const $ = id => document.getElementById(id)
+const FIELDS = ['supabase-url', 'supabase-key', 'client-id', 'organization-id', 'email']
+
+// Remembered so a reload does not mean retyping the setup. Never the password.
+for (const id of FIELDS) {
+  $(id).value = localStorage.getItem(`db_example_${id}`) || ''
+  $(id).addEventListener('change', () => localStorage.setItem(`db_example_${id}`, $(id).value))
+}
+
+let supabase = null
+let saToken = null
+
+function show(id, text, kind) {
+  const element = $(id)
+  element.hidden = false
+  element.textContent = text
+  element.className = kind || ''
+}
+
+function client() {
+  if (!supabase) throw new Error('Set the Supabase project URL and key first')
+  return supabase
+}
+
+async function supabaseClient() {
+  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2')
+  return createClient($('supabase-url').value.trim(), $('supabase-key').value.trim())
+}
+
+// Supabase compares the SHA-256 of the nonce it is given against the claim in the token, so the
+// claim has to be the digest. We send the digest and keep the original for Supabase.
+async function nonces() {
+  const nonce = crypto.randomUUID()
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(nonce))
+  const hashed = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('')
+
+  return { nonce, hashed }
+}
+
+$('sign-in-form').addEventListener('submit', async event => {
+  event.preventDefault()
+
+  try {
+    const response = await fetch(`${BASE}/sign_in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: $('email').value.trim(),
+        password: $('password').value,
+        organization_id: Number($('organization-id').value.trim()),
+      }),
+    })
+
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`)
+
+    saToken = body.token
+    supabase = await supabaseClient()
+    $('exchange').disabled = false
+
+    show('sign-in-out', `Signed in as ${body.user.email} (SolarAssistant user ${body.user.id}).`, 'ok')
+  } catch (error) {
+    show('sign-in-out', error.message, 'error')
+  }
+})
+
+$('exchange').addEventListener('click', async () => {
+  try {
+    const { nonce, hashed } = await nonces()
+
+    const response = await fetch(`${BASE}/id_token`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${saToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: $('client-id').value.trim(), nonce: hashed }),
+    })
+
+    const body = await response.json()
+    if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`)
+
+    const claims = JSON.parse(atob(body.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+
+    const { data, error } = await client().auth.signInWithIdToken({
+      provider: 'custom:solar-assistant',
+      token: body.id_token,
+      nonce,
+    })
+
+    if (error) throw error
+
+    const identity = data.user.identities?.[0]
+
+    show('exchange-out', [
+      `Identity token: sub ${claims.sub}, aud ${claims.aud}, good for ${body.expires_in}s.`,
+      `Supabase user: ${data.user.id}`,
+      `Supabase sees you as: ${identity?.provider} with provider_id ${identity?.provider_id}`,
+      `That provider_id is your SolarAssistant user id. auth.uid() is the Supabase id above.`,
+    ].join('\n'), 'ok')
+
+    $('write').disabled = false
+  } catch (error) {
+    show('exchange-out', error.message, 'error')
+  }
+})
+
+$('write').addEventListener('click', async () => {
+  try {
+    const { error: writeError } = await client()
+      .from('service_notes')
+      .insert({ note: $('note').value })
+
+    if (writeError) throw writeError
+
+    const { data, error } = await client().from('service_notes').select('id, user_id, note')
+    if (error) throw error
+
+    const { data: { user } } = await client().auth.getUser()
+
+    show('write-out', [
+      `Rows visible to you: ${data.length}`,
+      JSON.stringify(data, null, 2),
+      `Every user_id above is ${user.id}, which is what the policy on auth.uid() allows.`,
+    ].join('\n'), 'ok')
+  } catch (error) {
+    show('write-out', `${error.message}\n\nIf this says the table is missing, run the SQL above.`, 'error')
+  }
+})
+</script>
+
+</body>
+</html>
