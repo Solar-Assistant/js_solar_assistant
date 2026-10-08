@@ -97,7 +97,7 @@ export default {
   unknown: 'Nežinoma',
   no_local_devices: 'Šiame tinkle įrenginių dar nerasta.',
   not_seeing_your_device: 'Nematote savo įrenginio?',
-  local_discovery_explainer: 'Šis puslapis ieško SolarAssistant įrenginių tame tinkle, iš kurio naršote, todėl atidarykite jį tame pačiame tinkle kaip ir įrenginys.',
+  local_discovery_explainer: 'Šis puslapis ieško įrenginių tame tinkle, iš kurio naršote, todėl atidarykite jį tame pačiame tinkle kaip ir įrenginys.',
   local_discovery_hotspot_hint: 'Jei įrenginyje įvedėte WiFi pavadinimą ir slaptažodį, patikrinkite, ar jis nesukūrė savo WiFi prieigos taško. Tai reikštų, kad jam nepavyko prisijungti prie jūsų tinklo.',
   last_seen: 'Matytas paskutinį kartą',
   software_build: 'Programinės įrangos versija',

@@ -97,7 +97,7 @@ export default {
   unknown: 'Desconocido',
   no_local_devices: 'Aún no se encontraron dispositivos en esta red.',
   not_seeing_your_device: '¿No ves tu dispositivo?',
-  local_discovery_explainer: 'Esta página busca dispositivos SolarAssistant en la red desde la que estás navegando, así que ábrela en la misma red que el dispositivo.',
+  local_discovery_explainer: 'Esta página busca dispositivos en la red desde la que estás navegando, así que ábrela en la misma red que el dispositivo.',
   local_discovery_hotspot_hint: 'Si ingresaste un nombre de WiFi y una contraseña en el dispositivo, verifica si ha iniciado su propio punto de acceso WiFi. Eso significa que no logró conectarse a tu red.',
   last_seen: 'Visto por última vez',
   software_build: 'Compilación del software',

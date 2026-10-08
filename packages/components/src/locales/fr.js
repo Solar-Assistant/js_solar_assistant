@@ -97,7 +97,7 @@ export default {
   unknown: 'Inconnu',
   no_local_devices: 'Aucun appareil trouvé sur ce réseau pour l\'instant.',
   not_seeing_your_device: 'Vous ne voyez pas votre appareil ?',
-  local_discovery_explainer: 'Cette page recherche les appareils SolarAssistant sur le réseau depuis lequel vous naviguez, ouvrez-la donc sur le même réseau que l\'appareil.',
+  local_discovery_explainer: 'Cette page recherche les appareils sur le réseau depuis lequel vous naviguez, ouvrez-la donc sur le même réseau que l\'appareil.',
   local_discovery_hotspot_hint: 'Si vous avez saisi un nom de réseau WiFi et un mot de passe dans l\'appareil, vérifiez s\'il a démarré son propre point d\'accès WiFi. Cela signifie qu\'il n\'a pas réussi à rejoindre votre réseau.',
   last_seen: 'Dernière vue',
   software_build: 'Version du logiciel',

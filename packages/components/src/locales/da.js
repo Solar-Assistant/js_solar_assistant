@@ -97,7 +97,7 @@ export default {
   unknown: 'Ukendt',
   no_local_devices: 'Der er endnu ikke fundet nogen enheder på dette netværk.',
   not_seeing_your_device: 'Kan du ikke se din enhed?',
-  local_discovery_explainer: 'Denne side leder efter SolarAssistant-enheder på det netværk, du besøger siden fra, så åbn den på samme netværk som enheden.',
+  local_discovery_explainer: 'Denne side leder efter enheder på det netværk, du besøger siden fra, så åbn den på samme netværk som enheden.',
   local_discovery_hotspot_hint: 'Hvis du har indtastet et WiFi-navn og en adgangskode i enheden, så tjek, om den har startet sit eget WiFi-hotspot. Det betyder, at den ikke kunne komme på dit netværk.',
   last_seen: 'Sidst set',
   software_build: 'Softwareversion',

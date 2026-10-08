@@ -97,7 +97,7 @@ export default {
   unknown: 'Onbekend',
   no_local_devices: 'Nog geen toestelle op hierdie netwerk gevind nie.',
   not_seeing_your_device: 'Sien jy nie jou toestel nie?',
-  local_discovery_explainer: 'Hierdie bladsy soek na SolarAssistant-toestelle op die netwerk waarvandaan jy blaai, so maak dit oop op dieselfde netwerk as die toestel.',
+  local_discovery_explainer: 'Hierdie bladsy soek na toestelle op die netwerk waarvandaan jy blaai, so maak dit oop op dieselfde netwerk as die toestel.',
   local_discovery_hotspot_hint: 'As jy \'n WiFi-naam en wagwoord in die toestel ingevoer het, kyk of dit sy eie WiFi-hotspot begin het. Dit beteken dit kon nie by jou netwerk aansluit nie.',
   last_seen: 'Laas gesien',
   software_build: 'Sagtewarebou',

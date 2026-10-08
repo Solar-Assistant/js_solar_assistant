@@ -97,7 +97,7 @@ export default {
   unknown: 'Neznámý',
   no_local_devices: 'V této síti zatím nebyla nalezena žádná zařízení.',
   not_seeing_your_device: 'Nevidíte své zařízení?',
-  local_discovery_explainer: 'Tato stránka hledá zařízení SolarAssistant v síti, ze které prohlížíte, proto ji otevřete ve stejné síti, ve které je zařízení.',
+  local_discovery_explainer: 'Tato stránka hledá zařízení v síti, ze které prohlížíte, proto ji otevřete ve stejné síti, ve které je zařízení.',
   local_discovery_hotspot_hint: 'Pokud jste do zařízení zadali název a heslo WiFi, zkontrolujte, zda nespustilo vlastní WiFi hotspot. To by znamenalo, že se mu nepodařilo připojit k vaší síti.',
   last_seen: 'Naposledy viděno',
   software_build: 'Verze softwaru',

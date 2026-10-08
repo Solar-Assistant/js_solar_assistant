@@ -97,7 +97,7 @@ export default {
   unknown: '未知',
   no_local_devices: '目前在此網路上找不到任何裝置。',
   not_seeing_your_device: '找不到您的裝置？',
-  local_discovery_explainer: '此頁面會在您目前瀏覽所在的網路上尋找 SolarAssistant 裝置，因此請在與裝置相同的網路上開啟此頁面。',
+  local_discovery_explainer: '此頁面會在您目前瀏覽所在的網路上尋找裝置，因此請在與裝置相同的網路上開啟此頁面。',
   local_discovery_hotspot_hint: '如果您已在裝置中輸入 WiFi 名稱與密碼，請檢查它是否已自行啟動 WiFi 熱點。這表示它未能加入您的網路。',
   last_seen: '最後上線時間',
   software_build: '軟體版本',

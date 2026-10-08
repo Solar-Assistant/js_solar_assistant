@@ -97,7 +97,7 @@ export default {
   unknown: 'Không xác định',
   no_local_devices: 'Chưa tìm thấy thiết bị nào trên mạng này.',
   not_seeing_your_device: 'Không thấy thiết bị của bạn?',
-  local_discovery_explainer: 'Trang này tìm các thiết bị SolarAssistant trên mạng mà bạn đang truy cập, vì vậy hãy mở trang này trên cùng mạng với thiết bị.',
+  local_discovery_explainer: 'Trang này tìm các thiết bị trên mạng mà bạn đang truy cập, vì vậy hãy mở trang này trên cùng mạng với thiết bị.',
   local_discovery_hotspot_hint: 'Nếu bạn đã nhập tên WiFi và mật khẩu vào thiết bị, hãy kiểm tra xem thiết bị có tự phát điểm phát sóng WiFi riêng hay không. Điều đó có nghĩa là thiết bị không kết nối được vào mạng của bạn.',
   last_seen: 'Lần cuối xuất hiện',
   software_build: 'Bản dựng phần mềm',

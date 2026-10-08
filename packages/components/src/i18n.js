@@ -137,7 +137,7 @@ const MESSAGES = {
     unknown: 'Unknown',
     no_local_devices: 'No devices found on this network yet.',
     not_seeing_your_device: 'Not seeing your device?',
-    local_discovery_explainer: 'This page looks for SolarAssistant devices on the network you are browsing from, so open it on the same network as the device.',
+    local_discovery_explainer: 'This page looks for devices on the network you are browsing from, so open it on the same network as the device.',
     local_discovery_hotspot_hint: 'If you entered a WiFi name and password into the device, check whether it has started its own WiFi hotspot. That means it did not manage to join your network.',
     last_seen: 'Last seen',
     site: 'Site',

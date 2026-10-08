@@ -97,7 +97,7 @@ export default {
   unknown: 'Ismeretlen',
   no_local_devices: 'Egyelőre nem található eszköz ezen a hálózaton.',
   not_seeing_your_device: 'Nem látja az eszközét?',
-  local_discovery_explainer: 'Ez az oldal azon a hálózaton keres SolarAssistant eszközöket, amelyről böngészik, ezért ugyanazon a hálózaton nyissa meg, amelyiken az eszköz van.',
+  local_discovery_explainer: 'Ez az oldal azon a hálózaton keres eszközöket, amelyről böngészik, ezért ugyanazon a hálózaton nyissa meg, amelyiken az eszköz van.',
   local_discovery_hotspot_hint: 'Ha megadott egy WiFi-nevet és -jelszót az eszközön, ellenőrizze, hogy nem indított-e saját WiFi-hotspotot. Ez azt jelenti, hogy nem sikerült csatlakoznia a hálózatához.',
   last_seen: 'Utoljára látva',
   software_build: 'Szoftververzió',

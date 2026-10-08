@@ -97,7 +97,7 @@ export default {
   unknown: 'Onbekend',
   no_local_devices: 'Nog geen apparaten gevonden op dit netwerk.',
   not_seeing_your_device: 'Zie je je apparaat niet?',
-  local_discovery_explainer: 'Deze pagina zoekt naar SolarAssistant-apparaten op het netwerk waarmee je verbonden bent, dus open hem op hetzelfde netwerk als het apparaat.',
+  local_discovery_explainer: 'Deze pagina zoekt naar apparaten op het netwerk waarmee je verbonden bent, dus open hem op hetzelfde netwerk als het apparaat.',
   local_discovery_hotspot_hint: 'Als je een WiFi-naam en wachtwoord in het apparaat hebt ingevoerd, controleer dan of het een eigen WiFi-hotspot is gestart. Dat betekent dat het geen verbinding met je netwerk heeft kunnen maken.',
   last_seen: 'Laatst gezien',
   software_build: 'Softwarebuild',

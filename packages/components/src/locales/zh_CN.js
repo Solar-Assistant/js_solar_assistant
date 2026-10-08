@@ -97,7 +97,7 @@ export default {
   unknown: '未知',
   no_local_devices: '尚未在此网络上找到设备。',
   not_seeing_your_device: '找不到您的设备？',
-  local_discovery_explainer: '此页面会在您当前浏览所使用的网络中查找 SolarAssistant 设备，因此请在与设备相同的网络下打开此页面。',
+  local_discovery_explainer: '此页面会在您当前浏览所使用的网络中查找设备，因此请在与设备相同的网络下打开此页面。',
   local_discovery_hotspot_hint: '如果您已在设备中输入 WiFi 名称和密码，请检查它是否启用了自己的 WiFi 热点。这表示它未能加入您的网络。',
   last_seen: '上次在线',
   software_build: '软件版本',

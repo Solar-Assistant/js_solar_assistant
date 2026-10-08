@@ -97,7 +97,7 @@ export default {
   unknown: 'Necunoscut',
   no_local_devices: 'Nu au fost găsite deocamdată dispozitive în această rețea.',
   not_seeing_your_device: 'Nu vă vedeți dispozitivul?',
-  local_discovery_explainer: 'Această pagină caută dispozitive SolarAssistant în rețeaua din care navigați, așa că deschideți-o în aceeași rețea ca dispozitivul.',
+  local_discovery_explainer: 'Această pagină caută dispozitive în rețeaua din care navigați, așa că deschideți-o în aceeași rețea ca dispozitivul.',
   local_discovery_hotspot_hint: 'Dacă ați introdus un nume de rețea WiFi și o parolă în dispozitiv, verificați dacă acesta și-a pornit propriul hotspot WiFi. Aceasta înseamnă că nu a reușit să se conecteze la rețeaua dvs.',
   last_seen: 'Văzut ultima dată',
   software_build: 'Versiune software',
